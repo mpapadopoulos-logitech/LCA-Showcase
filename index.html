@@ -279,19 +279,28 @@
                         <h4 class="text-xl font-bold mb-5">Progress</h4>
                         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                             <!-- Step 1 -->
-                            <div class="bg-brand-cream/50 rounded-2xl p-6 border border-brand-lightGray">
+                            <div class="bg-brand-cream/50 rounded-2xl p-6 border border-brand-lightGray flex flex-col">
+                                <div class="w-full aspect-video rounded-xl overflow-hidden mb-4 border border-brand-lightGray shadow-sm bg-white">
+                                    <img src="https://raw.githubusercontent.com/mpapadopoulos-logitech/LCA-Showcase/refs/heads/main/Battery%20Access.gif" alt="Battery Access GIF" class="w-full h-full object-cover">
+                                </div>
                                 <h5 class="font-bold text-lg mb-2">Step 1 - Battery Access</h5>
                                 <p class="text-sm text-brand-black/80">Recyclers prioritize battery removal. Designing for quick and safe battery access increases product recycling value. We focus on this design aspect first. Try the battery access game linked above to examples of progress in Logitech products.</p>
                             </div>
                             <!-- Step 2 -->
-                            <div class="bg-brand-cream/50 rounded-2xl p-6 border border-brand-lightGray">
+                            <div class="bg-brand-cream/50 rounded-2xl p-6 border border-brand-lightGray flex flex-col">
+                                <div class="w-full aspect-video rounded-xl overflow-hidden mb-4 border border-brand-lightGray shadow-sm bg-white">
+                                    <img src="https://github.com/mpapadopoulos-logitech/LCA-Showcase/blob/main/Design%20for%20Grind.gif?raw=true" alt="Design for Grind GIF" class="w-full h-full object-cover">
+                                </div>
                                 <h5 class="font-bold text-lg mb-2">Step 2 - Design for Grind</h5>
                                 <p class="text-sm text-brand-black/80">Recycling must be high-speed to be profitable, so products are shredded or hammered rather than disassembled with tools. Effective recycling requires separating all materials, but permanent bonding of incompatible materials can prevent this.</p>
                             </div>
                             <!-- Step 3 -->
-                            <div class="bg-brand-cream/50 rounded-2xl p-6 border border-brand-lightGray">
+                            <div class="bg-brand-cream/50 rounded-2xl p-6 border border-brand-lightGray flex flex-col">
+                                <div class="w-full aspect-video rounded-xl overflow-hidden mb-4 border border-brand-lightGray shadow-sm bg-white">
+                                    <img src="https://github.com/mpapadopoulos-logitech/LCA-Showcase/blob/main/Materials.gif?raw=true" alt="Next Life Value GIF" class="w-full h-full object-cover">
+                                </div>
                                 <h5 class="font-bold text-lg mb-2">Step 3 - Use materials with next life value</h5>
-                                <p class="text-sm text-brand-black/80">Even materials that are technically feasible to recycle are not widely (globally) recycled due to limitations in value and adoption. Choosing widely recycled materials will maximize the end of life value of our products. For example, all metals (except magnesium) are widely recycled but only specific plastics grades are widely recycled like PP, PE, PS, HIPS and ABS. All other materials aren’t currently widely recycled so aren’t valuable to recyclers.</p>
+                                <p class="text-sm text-brand-black/80">Even materials that are technically feasible to recycle are not widely (globally) recycled due to limitations in value and adoption. For example, all metals (except magnesium) are widely recycled but only specific plastics grades are widely recycled like PP, PE, PS, HIPS and ABS. All other materials aren’t currently widely recycled.</p>
                             </div>
                         </div>
                     </div>
@@ -300,6 +309,24 @@
                     <div class="bg-white rounded-3xl p-8 shadow-sm md:col-span-12 border border-brand-lightGray">
                         <h4 class="text-xl font-bold mb-3">What's Next?</h4>
                         <p class="text-brand-black/80">Seeing is Believing. We are trying to give as many people the opportunity to see electronic recycling operations as possible. Reach out to the DfS team to see if there is a visit happening near you or <button onclick="openIframe('https://nmc360.tudelft.nl/recycling/')" class="text-brand-darkGreen font-bold underline decoration-2 underline-offset-2 hover:bg-brand-teal hover:no-underline transition-all cursor-pointer focus:outline-none px-1 rounded">click here to try a virtual tour</button>.</p>
+                        
+                        <!-- GIF Gallery Carousel -->
+                        <div class="mt-8 relative w-full aspect-video md:h-[450px] md:aspect-auto rounded-2xl overflow-hidden bg-brand-cream/30 border border-brand-lightGray shadow-inner flex items-center justify-center group">
+                            <img src="https://github.com/mpapadopoulos-logitech/LCA-Showcase/blob/main/ERI-1.gif?raw=true" alt="ERI Tour 1" class="carousel-img absolute w-full h-full object-contain opacity-100 transition-opacity duration-1000">
+                            <img src="https://github.com/mpapadopoulos-logitech/LCA-Showcase/blob/main/ERI-2.gif?raw=true" alt="ERI Tour 2" class="carousel-img absolute w-full h-full object-contain opacity-0 transition-opacity duration-1000">
+                            <img src="https://github.com/mpapadopoulos-logitech/LCA-Showcase/blob/main/ERI-3.gif?raw=true" alt="ERI Tour 3" class="carousel-img absolute w-full h-full object-contain opacity-0 transition-opacity duration-1000">
+                            <img src="https://github.com/mpapadopoulos-logitech/LCA-Showcase/blob/main/ERI-4.gif?raw=true" alt="ERI Tour 4" class="carousel-img absolute w-full h-full object-contain opacity-0 transition-opacity duration-1000">
+                            <img src="https://github.com/mpapadopoulos-logitech/LCA-Showcase/blob/main/ERI-5.gif?raw=true" alt="ERI Tour 5" class="carousel-img absolute w-full h-full object-contain opacity-0 transition-opacity duration-1000">
+                            <img src="https://github.com/mpapadopoulos-logitech/LCA-Showcase/blob/main/ERI-6.gif?raw=true" alt="ERI Tour 6" class="carousel-img absolute w-full h-full object-contain opacity-0 transition-opacity duration-1000">
+                            
+                            <!-- Manual Navigation Arrows -->
+                            <button onclick="changeCarousel(-1)" class="absolute left-2 md:left-4 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white text-brand-darkGreen p-2 md:p-3 rounded-full shadow-md z-20 opacity-0 group-hover:opacity-100 transition-all focus:outline-none" title="Previous Image">
+                                <svg class="w-5 h-5 md:w-6 md:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"></path></svg>
+                            </button>
+                            <button onclick="changeCarousel(1)" class="absolute right-2 md:right-4 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white text-brand-darkGreen p-2 md:p-3 rounded-full shadow-md z-20 opacity-0 group-hover:opacity-100 transition-all focus:outline-none" title="Next Image">
+                                <svg class="w-5 h-5 md:w-6 md:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"></path></svg>
+                            </button>
+                        </div>
                     </div>
                     
                     <!-- Who works on this -->
@@ -1511,11 +1538,75 @@
             requestAnimationFrame(physicsLoop);
         }
 
+        // --- Carousel Logic ---
+        let currentCarouselIndex = 0;
+        let carouselInterval = null;
+        let carouselPauseTimeout = null;
+
+        function startAutoCycle() {
+            if (carouselInterval) clearInterval(carouselInterval);
+            
+            carouselInterval = setInterval(() => {
+                changeCarousel(1, false);
+            }, 5000);
+        }
+
+        function initCarousel() {
+            const images = document.querySelectorAll('.carousel-img');
+            if (images.length === 0) return;
+            startAutoCycle();
+        }
+
+        function changeCarousel(direction, isManual = true) {
+            const images = document.querySelectorAll('.carousel-img');
+            if (images.length === 0) return;
+
+            // Fade out current image
+            images[currentCarouselIndex].classList.remove('opacity-100');
+            images[currentCarouselIndex].classList.add('opacity-0');
+            
+            // Calculate next index wrapping around correctly
+            currentCarouselIndex = (currentCarouselIndex + direction + images.length) % images.length;
+            
+            // Fade in new image
+            images[currentCarouselIndex].classList.remove('opacity-0');
+            images[currentCarouselIndex].classList.add('opacity-100');
+
+            if (isManual) {
+                // Pause auto-cycle
+                if (carouselInterval) clearInterval(carouselInterval);
+                if (carouselPauseTimeout) clearTimeout(carouselPauseTimeout);
+                
+                // Resume auto-cycle after 30 seconds
+                carouselPauseTimeout = setTimeout(() => {
+                    startAutoCycle();
+                }, 30000);
+            }
+        }
+
+        // --- Window Resize Hook ---
+        window.addEventListener('resize', () => {
+            if (isEngineRunning) {
+                updateDataEngine(currentIndex);
+            }
+        });
+
         // --- Safe DOM Initialization ---
         window.addEventListener("load", () => {
-            initBubbles();
-            renderOptions();
-            updateDataEngine(0);
+            // Waiting for full window load ensures web fonts and CSS flexbox layouts 
+            // have completely finished rendering before measuring container height.
+            setTimeout(() => {
+                initBubbles();
+                renderOptions();
+                updateDataEngine(0);
+                initCarousel();
+                
+                // Hard snap the initial Y position so the bubbles don't slowly float up from a 0-height state
+                bubbleNodes.forEach(node => {
+                    node.currentY = centerY;
+                    node.targetY = centerY;
+                });
+            }, 50);
         });
     </script>
 </body>
