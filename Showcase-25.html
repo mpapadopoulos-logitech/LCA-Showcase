@@ -1,0 +1,1522 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Logitech Life Cycle Analysis</title>
+    <!-- Import Retro Font for Game Button -->
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Brown', 'sans-serif'],
+                        retro: ['"Press Start 2P"', 'cursive'],
+                    },
+                    colors: {
+                        brand: {
+                            cream: '#F3F1EC',
+                            lightGreen: '#D6F5F0',
+                            darkGreen: '#0D3A38',
+                            black: '#1B1B1B',
+                            midGray: '#BEBEBE',
+                            lightGray: '#EEEEEE',
+                            white: '#FFFFFF',
+                            teal: '#00FDCF',
+                        },
+                        phase: {
+                            sourcingDark: '#32156D',
+                            sourcingLight: '#E6D9FF',
+                            distDark: '#3A4A87',
+                            distLight: '#D5DDFF',
+                            useDark: '#313A49',
+                            useLight: '#BFC8DB',
+                            eolDark: '#A3001A',
+                            eolLight: '#FFC6CD', 
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Custom scrollbars */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.1); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(0,0,0,0.2); }
+        
+        /* Prevent layout shift when modals open */
+        html { scrollbar-gutter: stable; }
+
+        /* Modal fade-in animation */
+        .modal-enter { animation: fadeIn 0.3s ease-out forwards; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.98); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        /* Bubble Base Styles */
+        .bubble-node {
+            transition: filter 0.3s ease;
+            cursor: pointer;
+            will-change: transform, width, height;
+            transform-origin: center center;
+        }
+        .bubble-node:hover {
+            filter: brightness(1.08) drop-shadow(0 15px 25px rgba(0,0,0,0.15));
+            z-index: 50 !important;
+        }
+        
+        .bubble-label {
+            will-change: transform;
+            transform-origin: center center;
+        }
+    </style>
+</head>
+<body class="bg-brand-cream text-brand-black font-sans h-screen w-screen flex flex-col overflow-hidden selection:bg-brand-teal selection:text-brand-darkGreen">
+
+    <!-- Header Section -->
+    <header class="flex-shrink-0 w-full pt-6 px-6 md:pt-8 md:px-10 z-20 relative flex flex-col lg:flex-row lg:justify-between lg:items-start gap-6 mb-4">
+        
+        <!-- Title & Subtitle (75% Width) -->
+        <div class="w-full lg:w-[75%] lg:pr-8">
+            <h1 class="text-3xl md:text-4xl lg:text-5xl font-bold leading-tight tracking-tight text-brand-darkGreen mb-3">
+                <span class="block mb-1">90% of Logitech’s Footprint comes from our products.</span>
+                <span class="block">We analyse this impact by life cycle stage.</span>
+            </h1>
+            <p class="text-sm md:text-base leading-relaxed text-brand-black/80 font-light hidden md:block">
+                There are four key phases to a life cycle analysis (LCA): sourcing and manufacture, distribution, consumer use, and end-of-life. Each of these phases comes with its own set of critical focus areas that will shape the final carbon impact of a product. Our multi-step, third-party reviewed methodology conforms to ISO 14067 and ISO 14044.
+            </p>
+        </div>
+
+        <!-- Dynamic Data Options Menu (25% Width) -->
+        <div class="w-full lg:w-[25%] bg-white/60 backdrop-blur-md p-4 md:p-5 rounded-2xl border border-brand-lightGray shadow-sm flex flex-col max-h-[25vh] lg:max-h-[30vh]">
+            <h3 class="text-base md:text-lg font-bold text-brand-darkGreen mb-3">Explore Product Impact</h3>
+            <div class="flex flex-col gap-2 overflow-y-auto pr-2">
+                <!-- Row 1: Core Categories -->
+                <div id="options-row-1" class="flex flex-wrap gap-1.5"></div>
+                <!-- Row 2: Specific Products -->
+                <div id="options-row-2" class="flex flex-wrap gap-1.5 mt-1"></div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Floating Bubble Chart Section -->
+    <main class="flex-grow relative mx-6 md:mx-10 mb-8 overflow-hidden flex flex-col" id="chart-container">
+        
+        <!-- DOM Layer for Interactive Bubbles -->
+        <div id="bubble-layer" class="absolute inset-0 w-full h-full pointer-events-none z-10">
+            <!-- JS dynamically injects bubble nodes and labels here -->
+        </div>
+
+        <!-- The Visual Timeline Axis -->
+        <div class="absolute bottom-6 md:bottom-10 left-0 w-full flex items-center px-10 md:px-20 z-0 pointer-events-none opacity-60 h-[40px]">
+            <span class="text-brand-darkGreen font-bold text-xs md:text-sm tracking-widest uppercase mr-4 whitespace-nowrap">Creation</span>
+            <div class="flex-grow h-0.5 bg-brand-darkGreen/30 relative">
+                <!-- Chevron arrows indicating flow direction -->
+                <div class="absolute right-[75%] top-1/2 -translate-y-1/2 w-3 h-3 border-t-2 border-r-2 border-brand-darkGreen/50 rotate-45"></div>
+                <div class="absolute right-[50%] top-1/2 -translate-y-1/2 w-3 h-3 border-t-2 border-r-2 border-brand-darkGreen/50 rotate-45"></div>
+                <div class="absolute right-[25%] top-1/2 -translate-y-1/2 w-3 h-3 border-t-2 border-r-2 border-brand-darkGreen/50 rotate-45"></div>
+                <div class="absolute right-0 top-1/2 -translate-y-1/2 w-3 h-3 border-t-2 border-r-2 border-brand-darkGreen/50 rotate-45"></div>
+            </div>
+            <span class="text-brand-darkGreen font-bold text-xs md:text-sm tracking-widest uppercase ml-4 whitespace-nowrap">Disposal</span>
+        </div>
+    </main>
+
+    <!-- Data Detail Modals Overlay -->
+    <div id="modalOverlay" class="fixed inset-0 bg-brand-black/60 backdrop-blur-sm z-40 hidden opacity-0 transition-opacity duration-300 flex items-center justify-center p-4 md:p-8" onclick="closeModalOnOutsideClick(event)">
+        
+        <!-- 1. Sourcing & Manufacture Modal -->
+        <div id="modal-sourcing" class="modal-content hidden w-full max-w-7xl h-[90vh] bg-phase-sourcingLight text-phase-sourcingDark rounded-[2rem] shadow-2xl relative flex flex-col overflow-hidden">
+            <div class="flex-shrink-0 flex justify-between items-start p-8 md:p-10 pb-4">
+                <div>
+                    <h2 class="text-4xl md:text-5xl font-bold mb-2">Sourcing & Manufacture</h2>
+                    <p class="text-xl opacity-90 font-medium mb-4">Impact of making our products</p>
+                    <span id="modal-val-sourcing" class="inline-block bg-phase-sourcingDark text-white px-4 py-2 rounded-full font-bold text-xl"></span>
+                </div>
+                <button onclick="closeModal()" class="bg-white/50 hover:bg-white text-phase-sourcingDark rounded-full p-3 transition-colors focus:outline-none">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+            <div class="flex-grow overflow-y-auto p-8 md:p-10 pt-4">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+                    <div class="flex flex-col gap-6">
+                        <div class="bg-phase-sourcingDark text-white rounded-2xl p-4 text-center shadow-sm">
+                            <h3 class="text-2xl font-bold">Materials & Sourcing</h3>
+                        </div>
+                        <div class="bg-white rounded-3xl p-8 shadow-sm">
+                            <h4 class="text-xl font-bold mb-3">Explainer</h4>
+                            <p class="text-brand-black/80">[Placeholder for sourcing explainer text.]</p>
+                        </div>
+                        <div class="bg-white rounded-3xl p-8 shadow-sm flex-grow">
+                            <h4 class="text-xl font-bold mb-3">Progress</h4>
+                            <div class="w-full h-32 bg-phase-sourcingLight/30 rounded-xl border border-phase-sourcingDark/10 flex items-center justify-center mb-4"><span class="text-sm font-medium opacity-50">[Graph Placeholder]</span></div>
+                            <p class="text-brand-black/80">[Placeholder for progress stats.]</p>
+                        </div>
+                    </div>
+                    <div class="flex flex-col gap-6">
+                        <div class="bg-phase-sourcingDark text-white rounded-2xl p-4 text-center shadow-sm">
+                            <h3 class="text-2xl font-bold">Manufacturing & Assembly</h3>
+                        </div>
+                        <div class="bg-white rounded-3xl p-8 shadow-sm">
+                            <h4 class="text-xl font-bold mb-3">Explainer</h4>
+                            <p class="text-brand-black/80">[Placeholder for manufacturing explainer.]</p>
+                        </div>
+                        <div class="bg-white rounded-3xl p-8 shadow-sm flex-grow">
+                            <h4 class="text-xl font-bold mb-3">Progress</h4>
+                            <div class="w-full h-32 bg-phase-sourcingLight/30 rounded-xl border border-phase-sourcingDark/10 flex items-center justify-center mb-4"><span class="text-sm font-medium opacity-50">[Graph Placeholder]</span></div>
+                            <p class="text-brand-black/80">[Placeholder for factory progress.]</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <div class="bg-white rounded-3xl p-8 shadow-sm border border-brand-lightGray">
+                        <h4 class="text-xl font-bold mb-3 flex items-center gap-2">Who works on this?</h4>
+                        <p class="text-brand-black/80">[Teams: Supply Chain, Procurement]</p>
+                    </div>
+                    <div class="bg-white rounded-3xl p-8 shadow-sm border border-brand-lightGray">
+                        <h4 class="text-xl font-bold mb-3 flex items-center gap-2">How can you help?</h4>
+                        <p class="font-medium text-brand-black/80">[Actionable advice for consumers.]</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 2. Distribution Modal -->
+        <div id="modal-distribution" class="modal-content hidden w-full max-w-6xl h-[90vh] bg-phase-distLight text-phase-distDark rounded-[2rem] shadow-2xl relative flex flex-col overflow-hidden">
+            <div class="flex-shrink-0 flex justify-between items-start p-8 md:p-10 pb-4">
+                <div>
+                    <h2 class="text-4xl md:text-5xl font-bold mb-2">Distribution</h2>
+                    <p class="text-xl opacity-90 font-medium mb-4">Impact of getting our products to consumers</p>
+                    <span id="modal-val-dist" class="inline-block bg-phase-distDark text-white px-4 py-2 rounded-full font-bold text-xl"></span>
+                </div>
+                <button onclick="closeModal()" class="bg-white/50 hover:bg-white text-phase-distDark rounded-full p-3 transition-colors focus:outline-none">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+            <div class="flex-grow overflow-y-auto p-8 md:p-10 pt-4">
+                <div class="grid grid-cols-1 md:grid-cols-12 gap-6">
+                    <div class="bg-white rounded-3xl p-8 shadow-sm md:col-span-12 border border-brand-lightGray">
+                        <h4 class="text-xl font-bold mb-3">Explainer</h4>
+                        <p class="text-brand-black/80">[Details on shipping routes.]</p>
+                    </div>
+                    <div class="bg-white rounded-3xl p-8 shadow-sm md:col-span-6 border border-brand-lightGray">
+                        <h4 class="text-xl font-bold mb-3">Progress</h4>
+                        <p class="text-brand-black/80">[Stats on reducing air freight.]</p>
+                    </div>
+                    <div class="bg-white rounded-3xl p-8 shadow-sm md:col-span-6 border border-brand-lightGray">
+                        <h4 class="text-xl font-bold mb-3">What's Next?</h4>
+                        <p class="text-brand-black/80">[Future logistics optimizations.]</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 3. Consumer Use Modal -->
+        <div id="modal-use" class="modal-content hidden w-full max-w-6xl h-[90vh] bg-phase-useLight text-phase-useDark rounded-[2rem] shadow-2xl relative flex flex-col overflow-hidden">
+            <div class="flex-shrink-0 flex justify-between items-start p-8 md:p-10 pb-4">
+                <div>
+                    <h2 class="text-4xl md:text-5xl font-bold mb-2">Consumer Use</h2>
+                    <p class="text-xl opacity-90 font-medium mb-4">Impact of using our products</p>
+                    <span id="modal-val-use" class="inline-block bg-phase-useDark text-white px-4 py-2 rounded-full font-bold text-xl"></span>
+                </div>
+                <button onclick="closeModal()" class="bg-white/50 hover:bg-white text-phase-useDark rounded-full p-3 transition-colors focus:outline-none">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+            <div class="flex-grow overflow-y-auto p-8 md:p-10 pt-4">
+                <div class="grid grid-cols-1 md:grid-cols-12 gap-6">
+                    <div class="bg-white rounded-3xl p-8 shadow-sm md:col-span-12 border border-brand-lightGray">
+                        <h4 class="text-xl font-bold mb-3">Explainer</h4>
+                        <p class="text-brand-black/80">[Electricity consumed by products.]</p>
+                    </div>
+                    <div class="bg-white rounded-3xl p-8 shadow-sm md:col-span-6 border border-brand-lightGray">
+                        <h4 class="text-xl font-bold mb-3">Progress</h4>
+                        <p class="text-brand-black/80">[Improved battery life.]</p>
+                    </div>
+                    <div class="bg-white rounded-3xl p-8 shadow-sm md:col-span-6 border border-brand-lightGray">
+                        <h4 class="text-xl font-bold mb-3">What's Next?</h4>
+                        <p class="text-brand-black/80">[Ultra-low power sensors.]</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 4. End of Life Modal -->
+        <div id="modal-eol" class="modal-content hidden w-full max-w-6xl h-[90vh] bg-phase-eolLight text-phase-eolDark rounded-[2rem] shadow-2xl relative flex flex-col overflow-hidden">
+            <div class="flex-shrink-0 flex justify-between items-start p-8 md:p-10 pb-4">
+                <div class="flex-grow flex flex-col md:flex-row md:items-start justify-between gap-4 mr-4">
+                    <div>
+                        <h2 class="text-4xl md:text-5xl font-bold mb-2">End of Life</h2>
+                        <p class="text-xl opacity-90 font-medium mb-4">Impact of disposing of our products</p>
+                        <span id="modal-val-eol" class="inline-block bg-phase-eolDark text-white px-4 py-2 rounded-full font-bold text-xl"></span>
+                    </div>
+                    <!-- Launch Game Retro Button -->
+                    <button onclick="openGame()" class="flex-shrink-0 bg-brand-black hover:bg-brand-teal hover:text-brand-darkGreen text-white font-retro text-[10px] md:text-xs px-4 py-3 rounded border-b-4 border-r-4 border-gray-600 hover:border-brand-darkGreen flex items-center gap-3 shadow-md transition-all active:border-b-0 active:border-r-0 active:translate-y-1 active:translate-x-1 focus:outline-none md:mt-2">
+                        <span class="text-xl md:text-2xl leading-none">🎮</span> 
+                        <span class="leading-tight text-left">LAUNCH<br>BATTERY RESCUE</span>
+                    </button>
+                </div>
+                <button onclick="closeModal()" class="bg-white/50 hover:bg-white text-phase-eolDark rounded-full p-3 transition-colors focus:outline-none flex-shrink-0">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+            
+            <div class="flex-grow overflow-y-auto p-8 md:p-10 pt-4">
+                <div class="grid grid-cols-1 md:grid-cols-12 gap-6">
+                    
+                    <!-- Explainer -->
+                    <div class="bg-white rounded-3xl p-8 shadow-sm md:col-span-12 border border-brand-lightGray">
+                        <h4 class="text-xl font-bold mb-3">Explainer</h4>
+                        <p class="text-brand-black/80">We determine end-of-life carbon impact using product and packaging weights alongside regional disposal data for incineration, landfill, and recycling. We prioritize designing for safer, faster, and more effective recycling to maximize recovery.</p>
+                    </div>
+                    
+                    <!-- Progress (Full width to fit steps) -->
+                    <div class="bg-white rounded-3xl p-8 shadow-sm md:col-span-12 border border-brand-lightGray">
+                        <h4 class="text-xl font-bold mb-5">Progress</h4>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                            <!-- Step 1 -->
+                            <div class="bg-brand-cream/50 rounded-2xl p-6 border border-brand-lightGray">
+                                <h5 class="font-bold text-lg mb-2">Step 1 - Battery Access</h5>
+                                <p class="text-sm text-brand-black/80">Recyclers prioritize battery removal. Designing for quick and safe battery access increases product recycling value. We focus on this design aspect first. Try the battery access game linked above to examples of progress in Logitech products.</p>
+                            </div>
+                            <!-- Step 2 -->
+                            <div class="bg-brand-cream/50 rounded-2xl p-6 border border-brand-lightGray">
+                                <h5 class="font-bold text-lg mb-2">Step 2 - Design for Grind</h5>
+                                <p class="text-sm text-brand-black/80">Recycling must be high-speed to be profitable, so products are shredded or hammered rather than disassembled with tools. Effective recycling requires separating all materials, but permanent bonding of incompatible materials can prevent this.</p>
+                            </div>
+                            <!-- Step 3 -->
+                            <div class="bg-brand-cream/50 rounded-2xl p-6 border border-brand-lightGray">
+                                <h5 class="font-bold text-lg mb-2">Step 3 - Use materials with next life value</h5>
+                                <p class="text-sm text-brand-black/80">Even materials that are technically feasible to recycle are not widely (globally) recycled due to limitations in value and adoption. Choosing widely recycled materials will maximize the end of life value of our products. For example, all metals (except magnesium) are widely recycled but only specific plastics grades are widely recycled like PP, PE, PS, HIPS and ABS. All other materials aren’t currently widely recycled so aren’t valuable to recyclers.</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- What's Next? -->
+                    <div class="bg-white rounded-3xl p-8 shadow-sm md:col-span-12 border border-brand-lightGray">
+                        <h4 class="text-xl font-bold mb-3">What's Next?</h4>
+                        <p class="text-brand-black/80">Seeing is Believing. We are trying to give as many people the opportunity to see electronic recycling operations as possible. Reach out to the DfS team to see if there is a visit happening near you or <button onclick="openIframe('https://nmc360.tudelft.nl/recycling/')" class="text-brand-darkGreen font-bold underline decoration-2 underline-offset-2 hover:bg-brand-teal hover:no-underline transition-all cursor-pointer focus:outline-none px-1 rounded">click here to try a virtual tour</button>.</p>
+                    </div>
+                    
+                    <!-- Who works on this -->
+                    <div class="bg-white rounded-3xl p-8 shadow-sm md:col-span-6 border border-brand-lightGray">
+                        <h4 class="text-xl font-bold mb-5">Who works on this?</h4>
+                        <ul class="space-y-4">
+                            <li class="flex items-center gap-4">
+                                <img src="https://flagcdn.com/w40/ie.png" alt="Ireland Flag" class="w-8 shadow-sm rounded-sm object-contain" title="Ireland">
+                                <div class="leading-tight">
+                                    <p class="font-bold text-brand-black">Sinead McCabe</p>
+                                    <p class="text-sm text-brand-black/80 mt-0.5">Stewardship Program Manager</p>
+                                </div>
+                            </li>
+                            <li class="flex items-center gap-4">
+                                <img src="https://flagcdn.com/w40/us.png" alt="USA Flag" class="w-8 shadow-sm rounded-sm object-contain" title="United States">
+                                <div class="leading-tight">
+                                    <p class="font-bold text-brand-black">Marcus Papadopoulos</p>
+                                    <p class="text-sm text-brand-black/80 mt-0.5">Design for Sustainability Specialist</p>
+                                </div>
+                            </li>
+                            <li class="flex items-center gap-4">
+                                <img src="https://flagcdn.com/w40/tw.png" alt="Taiwan Flag" class="w-8 shadow-sm rounded-sm object-contain" title="Taiwan">
+                                <div class="leading-tight">
+                                    <p class="font-bold text-brand-black">Yi-Hsieh Wang</p>
+                                    <p class="text-sm text-brand-black/80 mt-0.5">Snr. Sustainability Engineering Scientist</p>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                    
+                    <!-- How can you help -->
+                    <div class="bg-white rounded-3xl p-8 shadow-sm md:col-span-6 border border-brand-lightGray">
+                        <h4 class="text-xl font-bold mb-4">How can you help?</h4>
+                        <ul class="list-disc pl-5 space-y-3 font-medium text-brand-black/80">
+                            <li>Help design teams follow the design for recycling best practices</li>
+                            <li>Bring your old electronics into a Logitech office or other E-Waste Recycling Collection Point. <a href="https://www.logitech.com/en-us/sustainability/recycling.html#global-recycling-centers" target="_blank" rel="noopener noreferrer" class="text-brand-darkGreen font-bold underline decoration-2 underline-offset-2 hover:bg-brand-teal hover:no-underline transition-all cursor-pointer focus:outline-none px-1 rounded">Click here to find one near you.</a></li>
+                        </ul>
+                    </div>
+                    
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- External IFrame Modal Overlay (For Links) -->
+    <div id="iframeModal" class="fixed inset-0 bg-brand-black/80 backdrop-blur-sm z-[100] hidden opacity-0 transition-opacity duration-300 flex items-center justify-center p-4 md:p-8" onclick="closeIframeOnOutsideClick(event)">
+        <div class="bg-white w-full max-w-7xl h-full rounded-[2rem] shadow-2xl relative flex flex-col overflow-hidden">
+            <!-- Header & Browser Controls -->
+            <div class="flex-shrink-0 flex justify-between items-center p-4 md:p-5 border-b border-brand-lightGray bg-brand-cream">
+                <div class="flex items-center gap-2">
+                    <button onclick="iframeGoBack()" class="p-2 bg-white hover:bg-brand-lightGray rounded-full text-brand-black shadow-sm transition-colors focus:outline-none" title="Go Back">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"></path></svg>
+                    </button>
+                    <button onclick="iframeGoForward()" class="p-2 bg-white hover:bg-brand-lightGray rounded-full text-brand-black shadow-sm transition-colors focus:outline-none" title="Go Forward">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"></path></svg>
+                    </button>
+                    <button onclick="iframeRefresh()" class="p-2 bg-white hover:bg-brand-lightGray rounded-full text-brand-black shadow-sm transition-colors focus:outline-none ml-2" title="Reload Page">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+                    </button>
+                </div>
+                
+                <h2 class="text-base md:text-lg font-bold text-brand-darkGreen truncate px-4">External Resource</h2>
+                
+                <div class="flex items-center gap-2">
+                    <button onclick="iframeOpenNew()" class="p-2 bg-white hover:bg-brand-lightGray rounded-full text-brand-black shadow-sm transition-colors focus:outline-none mr-2 hidden sm:block" title="Open in New Window">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
+                    </button>
+                    <button onclick="closeIframe()" class="bg-white hover:bg-brand-lightGray text-brand-black rounded-full p-2 shadow-sm transition-colors focus:outline-none" title="Close Popup">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"></path></svg>
+                    </button>
+                </div>
+            </div>
+            <!-- Iframe Container -->
+            <div class="flex-grow w-full h-full relative bg-brand-lightGray">
+               <div class="absolute inset-0 flex justify-center items-center pointer-events-none">
+                   <!-- Loading Spinner underlying the iframe -->
+                   <div class="animate-spin rounded-full h-12 w-12 border-b-4 border-brand-teal"></div>
+               </div>
+               <iframe id="externalIframe" class="relative z-10 w-full h-full border-0 bg-white" src="" onload="this.style.opacity='1'" style="opacity:0; transition: opacity 0.3s;"></iframe>
+            </div>
+        </div>
+    </div>
+
+    <!-- Battery Rescue Game Modal Overlay -->
+    <div id="gameModal" class="fixed inset-0 bg-brand-black/90 backdrop-blur-sm z-[100] hidden opacity-0 transition-opacity duration-300 flex items-center justify-center p-4 md:p-8" onclick="closeGameOnOutsideClick(event)">
+        <div class="bg-[#1a202c] w-full max-w-5xl h-full md:h-[85vh] rounded-[1.5rem] shadow-2xl relative flex flex-col overflow-hidden border-4 border-gray-600">
+            <!-- Header & Controls -->
+            <div class="flex-shrink-0 flex justify-between items-center p-3 md:p-4 border-b border-gray-700 bg-gray-800">
+                <div class="flex items-center gap-3">
+                    <span class="text-xl leading-none">🎮</span>
+                    <h2 class="text-xs md:text-sm font-retro text-green-400 truncate tracking-widest mt-1">BATTERY RESCUE OS</h2>
+                </div>
+                <button onclick="closeGame()" class="bg-gray-700 hover:bg-gray-600 text-white rounded p-2 transition-colors focus:outline-none border-b-2 border-gray-900 active:border-0 active:translate-y-px">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+            <!-- Embedded Game Container -->
+            <div class="flex-grow w-full h-full relative bg-[#1a202c]">
+               <iframe id="gameIframe" class="relative z-10 w-full h-full border-0" src="" onload="this.style.opacity='1'" style="opacity:0; transition: opacity 0.3s;"></iframe>
+            </div>
+        </div>
+    </div>
+
+    <!-- Safe Raw Game Data Storage -->
+    <textarea id="game-source-code" style="display:none;">
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Battery Rescue: The Right to Repair</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Custom Game Fonts & Animations */
+        @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Roboto:wght@400;700&display=swap');
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #1a202c;
+            color: #e2e8f0;
+            user-select: none;
+        }
+
+        h1, h2, h3, .retro-text {
+            font-family: 'Press Start 2P', cursive;
+            text-transform: uppercase;
+        }
+
+        /* Board & Grid */
+        #game-board {
+            width: 420px;
+            height: 420px;
+            background-color: #2d3748; /* Dark asphalt */
+            background-image: 
+                linear-gradient(to right, #4a5568 2px, transparent 2px),
+                linear-gradient(to bottom, #4a5568 2px, transparent 2px);
+            background-size: 70px 70px; /* 6x6 grid */
+            border: 6px solid #cbd5e0;
+            position: relative;
+            border-right-color: #cbd5e0; /* Default solid right border */
+            overflow: visible; /* Allow battery to exit */
+        }
+
+        /* The Exit */
+        .exit-gap {
+            position: absolute;
+            right: -6px;
+            top: 140px; /* Row 2 (0, 1, 2) -> 2 * 70px */
+            width: 6px;
+            height: 70px;
+            background-color: #2d3748;
+            z-index: 10;
+        }
+        .exit-sign {
+            position: absolute;
+            right: -80px;
+            top: 140px;
+            height: 70px;
+            width: 70px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 10px;
+            color: #48bb78;
+            border: 2px dashed #48bb78;
+            background: rgba(72, 187, 120, 0.1);
+        }
+
+        /* Cars */
+        .car {
+            position: absolute;
+            border-radius: 8px;
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.5), 2px 2px 5px rgba(0,0,0,0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: opacity 0.2s, filter 0.2s;
+            touch-action: none;
+        }
+        
+        /* Battery Car Specific */
+        .car-battery {
+            background: linear-gradient(90deg, #48bb78 70%, #38a169 70%);
+            border: 3px solid #276749;
+        }
+        .battery-terminal {
+            position: absolute;
+            right: -6px;
+            top: 25%;
+            height: 50%;
+            width: 6px;
+            background: #cbd5e0;
+            border-radius: 0 4px 4px 0;
+            border: 2px solid #718096;
+            border-left: none;
+        }
+        .battery-label {
+            color: white;
+            font-weight: bold;
+            font-size: 24px;
+            text-shadow: 1px 1px 0 #000;
+            pointer-events: none;
+        }
+
+        /* Regular Blockers */
+        .car-blocker {
+            background: linear-gradient(135deg, #4299e1, #2b6cb0);
+            border: 2px solid #2c5282;
+        }
+        .car-blocker.alt-1 { background: linear-gradient(135deg, #ed8936, #c05621); border-color: #9c4221; }
+        .car-blocker.alt-2 { background: linear-gradient(135deg, #9f7aea, #6b46c1); border-color: #553c9a; }
+        .car-blocker.alt-3 { background: linear-gradient(135deg, #f56565, #c53030); border-color: #9b2c2c; }
+
+        /* Damage States */
+        .damage-1 { filter: brightness(0.8) contrast(1.2); }
+        .damage-1::after { content: "💥"; position: absolute; font-size: 28px; opacity: 0.8; }
+        .damage-2 { filter: brightness(0.5) contrast(1.5) sepia(0.5); transform: rotate(2deg) scale(0.98); }
+        .damage-2::after { content: "💥"; position: absolute; font-size: 40px; opacity: 0.9; }
+
+        /* Screws */
+        .screw {
+            position: absolute;
+            width: 26px;
+            height: 26px;
+            background-color: #a0aec0;
+            border-radius: 50%;
+            border: 2px solid #4a5568;
+            box-shadow: inset 1px 1px 2px rgba(255,255,255,0.5), inset -1px -1px 2px rgba(0,0,0,0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 20;
+        }
+        .screw-phillips::after {
+            content: "+";
+            font-size: 14px;
+            font-weight: bold;
+            color: #2d3748;
+            transform: rotate(45deg);
+        }
+        .screw-bolt {
+            border-radius: 6px; /* hexagonal look */
+        }
+        .screw-bolt::after {
+            content: "";
+            width: 10px;
+            height: 10px;
+            background-color: #2d3748;
+            border-radius: 50%;
+        }
+        .screw.removed {
+            display: none;
+        }
+
+        /* Glued visual */
+        .glued::after {
+            content: "";
+            position: absolute;
+            inset: -4px; /* Slight overflow to look like a spill */
+            background-color: rgba(255, 255, 255, 0.25); /* High transparency */
+            border-radius: 10px 14px 12px 8px; /* Slightly irregular glob shape */
+            border: 2px solid rgba(255, 255, 255, 0.4);
+            /* Add inner and outer shadows to perfectly match the visual style of the cars */
+            box-shadow: 
+                inset 0 0 10px rgba(255,255,255,0.7), 
+                2px 2px 5px rgba(0,0,0,0.3);
+            z-index: 5;
+            pointer-events: none;
+            /* A couple of subtle spots to sell the glue look */
+            background-image: 
+                radial-gradient(circle at 15% 85%, rgba(255,255,255,0.4) 6px, transparent 8px),
+                radial-gradient(circle at 85% 15%, rgba(255,255,255,0.3) 8px, transparent 10px);
+        }
+
+        /* Glue Bottle Icon overlay */
+        .glued::before {
+            content: "";
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            width: 40px; height: 40px;
+            /* Simple line art SVG Glue Bottle matching your reference */
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='rgba(255,255,255,0.9)' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='4' y='10' width='14' height='12' rx='3'/%3E%3Crect x='7' y='14' width='8' height='5' rx='1'/%3E%3Cpath d='M7 10V8h8v2'/%3E%3Cpath d='M9 8V6h4v2'/%3E%3Cpath d='M10 6l1-4 1 4'/%3E%3Cpath d='M21 6c0 1.1-.9 2-2 2s-2-.9-2-2c0-1.5 2-4 2-4s2 2.5 2 4z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: center;
+            z-index: 6;
+            pointer-events: none;
+            filter: drop-shadow(1px 2px 2px rgba(0,0,0,0.4));
+        }
+
+        /* Tools */
+        .tool-btn {
+            transition: all 0.2s;
+        }
+        .tool-btn.active {
+            background-color: #ecc94b;
+            color: #744210;
+            transform: scale(1.1);
+            box-shadow: 0 0 15px rgba(236, 201, 75, 0.5);
+        }
+        .tool-btn:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+
+        /* Cursors */
+        .cursor-hand { cursor: grab; }
+        .cursor-hand:active { cursor: grabbing; }
+        /* Using inline SVGs for tool cursors */
+        .cursor-screwdriver { cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l-2 4h4z"/><path d="M11 6v8h2V6z"/><rect x="9" y="14" width="6" height="8" rx="2" fill="white"/></svg>') 12 2, auto; }
+        .cursor-wrench { cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"></path></svg>') 4 20, auto; }
+        .cursor-hammer { cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 12l-8.5 8.5c-.83.83-2.17.83-3 0 0 0 0 0 0 0a2.12 2.12 0 0 1 0-3L12 9"></path><path d="M17.64 15L22 10.64"></path><path d="M20.91 11.7l-1.25-1.25c-.6-.6-.93-1.4-.93-2.25v-.86L16.01 4.6a5.56 5.56 0 0 0-3.94-1.64H11.2B9.44 2.96 8.5 4 8.5 5v.5"></path></svg>') 0 24, auto; }
+
+        /* Overlays */
+        #fire-overlay, #win-overlay {
+            position: absolute;
+            inset: 0;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 50;
+            background: rgba(0,0,0,0.85);
+            text-align: center;
+            padding: 20px;
+        }
+        .fire-emoji {
+            font-size: 60px; /* Shrunk slightly to make room for product image */
+            animation: shake 0.5s infinite;
+        }
+        @keyframes shake {
+            0% { transform: translate(1px, 1px) rotate(0deg); }
+            10% { transform: translate(-1px, -2px) rotate(-1deg); }
+            20% { transform: translate(-3px, 0px) rotate(1deg); }
+            30% { transform: translate(3px, 2px) rotate(0deg); }
+            40% { transform: translate(1px, -1px) rotate(1deg); }
+            50% { transform: translate(-1px, 2px) rotate(-1deg); }
+            60% { transform: translate(-3px, 1px) rotate(0deg); }
+            70% { transform: translate(3px, 1px) rotate(-1deg); }
+            80% { transform: translate(-1px, -1px) rotate(1deg); }
+            90% { transform: translate(1px, 2px) rotate(0deg); }
+            100% { transform: translate(1px, -2px) rotate(-1deg); }
+        }
+
+        .category-card {
+            transition: transform 0.2s, border-color 0.2s;
+        }
+        .category-card:hover {
+            transform: translateY(-2px);
+            border-color: #4299e1;
+        }
+
+        /* Product Image Retro Styling */
+        .retro-product-img {
+            width: 220px;
+            height: 125px;
+            object-fit: contain;
+            border-radius: 4px;
+            filter: contrast(1.2) saturate(1.5) sepia(0.3);
+            image-rendering: pixelated;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center">
+
+    <!-- SPLASH / MENU MODAL -->
+    <div id="menu-modal" class="w-full max-w-4xl p-6 bg-gray-800 rounded-xl shadow-2xl border border-gray-700">
+        <h1 class="text-3xl text-center text-green-400 mb-8 retro-text">Battery Rescue</h1>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <!-- Cat 1 -->
+            <button onclick="startGame(1)" class="category-card p-6 bg-gray-700 rounded-lg border-2 border-transparent text-left hover:bg-gray-600 focus:outline-none">
+                <div class="flex items-center justify-between mb-2">
+                    <h2 class="text-xl font-bold text-white">Category 1</h2>
+                    <span class="px-2 py-1 bg-green-900 text-green-300 text-xs rounded retro-text">Easy</span>
+                </div>
+                <h3 class="text-lg text-blue-300 mb-2">No Tools, 1 Step</h3>
+                <p class="text-gray-400 text-sm">The battery is easily accessible. Move the single blocking component out of the way to slide the battery out.</p>
+            </button>
+
+            <!-- Cat 2 -->
+            <button onclick="startGame(2)" class="category-card p-6 bg-gray-700 rounded-lg border-2 border-transparent text-left hover:bg-gray-600 focus:outline-none">
+                <div class="flex items-center justify-between mb-2">
+                    <h2 class="text-xl font-bold text-white">Category 2</h2>
+                    <span class="px-2 py-1 bg-yellow-900 text-yellow-300 text-xs rounded retro-text">Medium</span>
+                </div>
+                <h3 class="text-lg text-blue-300 mb-2">1 Tool, 1 Step</h3>
+                <p class="text-gray-400 text-sm">The component is held down by screws. You'll need a Phillips screwdriver to remove them before moving the blocker.</p>
+            </button>
+
+            <!-- Cat 3 -->
+            <button onclick="startGame(3)" class="category-card p-6 bg-gray-700 rounded-lg border-2 border-transparent text-left hover:bg-gray-600 focus:outline-none">
+                <div class="flex items-center justify-between mb-2">
+                    <h2 class="text-xl font-bold text-white">Category 3</h2>
+                    <span class="px-2 py-1 bg-orange-900 text-orange-300 text-xs rounded retro-text">Hard</span>
+                </div>
+                <h3 class="text-lg text-blue-300 mb-2">Multiple Steps & Tools</h3>
+                <p class="text-gray-400 text-sm">A messy interior! Multiple screws types require switching tools. If you get stuck, the hammer can destroy blockers (3 hits) – but don't hit the battery!</p>
+            </button>
+
+            <!-- Cat 4 -->
+            <button onclick="startGame(4)" class="category-card p-6 bg-gray-700 rounded-lg border-2 border-transparent text-left hover:bg-gray-600 focus:outline-none">
+                <div class="flex items-center justify-between mb-2">
+                    <h2 class="text-xl font-bold text-white">Category 4</h2>
+                    <span class="px-2 py-1 bg-red-900 text-red-300 text-xs rounded retro-text">Impossible</span>
+                </div>
+                <h3 class="text-lg text-blue-300 mb-2">Glued into Place</h3>
+                <p class="text-gray-400 text-sm">Hostile design. All components, including the battery, are glued together. Attempting to pry them apart with tools will cause a catastrophic failure.</p>
+            </button>
+        </div>
+    </div>
+
+    <!-- GAME CONTAINER -->
+    <div id="game-container" class="hidden flex flex-col items-center">
+        
+        <!-- Header -->
+        <div class="w-full max-w-lg flex justify-between items-end mb-4">
+            <div>
+                <h2 class="text-xl text-green-400 retro-text mb-1">Battery Rescue</h2>
+                <div id="level-indicator" class="text-sm text-yellow-400 retro-text tracking-wider">CATEGORY 1</div>
+            </div>
+            <div class="flex gap-2">
+                <button onclick="restartLevel()" class="px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded text-sm font-bold text-white transition">
+                    Restart
+                </button>
+                <button onclick="showMenu()" class="px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded text-sm font-bold text-white transition">
+                    Menu
+                </button>
+            </div>
+        </div>
+
+        <!-- Toolbar -->
+        <div class="w-full max-w-lg bg-gray-800 p-3 rounded-t-xl border border-gray-700 border-b-0 flex gap-2 justify-center">
+            <button id="tool-hand" class="tool-btn active flex items-center justify-center p-2 rounded bg-gray-700 text-white w-12 h-12" onclick="selectTool('hand')" title="Hand (Drag)">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 11V6a2 2 0 0 0-4 0v4 M14 11V4a2 2 0 0 0-4 0v6 M10 11V5a2 2 0 0 0-4 0v9a6 6 0 0 0 10 3.5"/></svg>
+            </button>
+            <button id="tool-screwdriver" class="tool-btn flex items-center justify-center p-2 rounded bg-gray-700 text-white w-12 h-12 hidden" onclick="selectTool('screwdriver')" title="Screwdriver">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l-2 4h4z"/><path d="M11 6v8h2V6z"/><rect x="9" y="14" width="6" height="8" rx="2" fill="currentColor"/></svg>
+            </button>
+            <button id="tool-wrench" class="tool-btn flex items-center justify-center p-2 rounded bg-gray-700 text-white w-12 h-12 hidden" onclick="selectTool('wrench')" title="Wrench">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"></path></svg>
+            </button>
+            <button id="tool-hammer" class="tool-btn flex items-center justify-center p-2 rounded bg-gray-700 text-white w-12 h-12 hidden" onclick="selectTool('hammer')" title="Hammer">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 12l-8.5 8.5c-.83.83-2.17.83-3 0 0 0 0 0 0 0a2.12 2.12 0 0 1 0-3L12 9"></path><path d="M17.64 15L22 10.64"></path><path d="M20.91 11.7l-1.25-1.25c-.6-.6-.93-1.4-.93-2.25v-.86L16.01 4.6a5.56 5.56 0 0 0-3.94-1.64H11.2B9.44 2.96 8.5 4 8.5 5v.5"></path></svg>
+            </button>
+        </div>
+
+        <!-- Board -->
+        <div id="game-board" class="cursor-hand">
+            <div class="exit-gap"></div>
+            <div class="exit-sign">EXIT</div>
+            <!-- Cars rendered here via JS -->
+            
+            <!-- Overlays inside board -->
+            <div id="fire-overlay" class="rounded">
+                <div class="fire-emoji mb-2">🔥</div>
+                <h3 class="text-red-500 retro-text text-lg mb-1">THERMAL RUNAWAY!</h3>
+                <p id="fire-message" class="text-white text-xs max-w-xs mb-3"></p>
+                
+                <!-- Product Example -->
+                <div class="flex flex-col items-center border-t border-gray-600 pt-3 w-full">
+                    <span class="text-[8px] text-gray-400 retro-text mb-2">REAL WORLD EXAMPLE:</span>
+                    <img id="fail-product-img" src="" class="retro-product-img">
+                    <div id="fail-product-name" class="text-[10px] text-blue-300 retro-text mt-2 text-center leading-tight max-w-[200px]"></div>
+                </div>
+            </div>
+            <div id="win-overlay" class="rounded">
+                <div class="text-5xl mb-2">🔋</div>
+                <h3 class="text-green-400 retro-text text-lg mb-1">BATTERY RESCUED!</h3>
+                <p class="text-white text-xs max-w-xs mb-3">The device can now be safely recycled.</p>
+
+                <!-- Product Example -->
+                <div class="flex flex-col items-center border-t border-gray-600 pt-3 w-full">
+                    <span class="text-[8px] text-gray-400 retro-text mb-2">REAL WORLD EXAMPLE:</span>
+                    <img id="win-product-img" src="" class="retro-product-img">
+                    <div id="win-product-name" class="text-[10px] text-blue-300 retro-text mt-2 text-center leading-tight max-w-[200px]"></div>
+                </div>
+            </div>
+        </div>
+        
+        <p class="mt-4 text-xs text-gray-500 max-w-md text-center">
+            Goal: Move the green battery out the EXIT on the right. 
+            Select tools from the top bar to handle screws or break blockers.
+        </p>
+    </div>
+
+    <script>
+        // Game Constants
+        const CELL_SIZE = 70;
+        const GRID_SIZE = 6;
+        
+        // Game State
+        let currentCategory = 1;
+        let selectedTool = 'hand';
+        let cars = [];
+        let isDragging = false;
+        let activeCar = null;
+        let dragStart = { x: 0, y: 0 };
+        let carStartPos = { x: 0, y: 0 };
+        let gameState = 'menu'; // menu, playing, over, won
+
+        // Product Data
+        const categoryProducts = {
+            1: { name: "Logitech Signature M650", img: "https://guide-images.cdn.ifixit.com/igi/wuqjKFOBcgGVGwfX.huge" },
+            2: { name: "Logitech G515 Lightspeed TKL", img: "https://guide-images.cdn.ifixit.com/igi/pxWJLtKCdgwIWa56.huge" },
+            3: { name: "MX Master 3s", img: "https://guide-images.cdn.ifixit.com/igi/1AZuudhJMVpR6Zba.huge" },
+            4: { name: "Logitech Crayon", img: "https://resource.logitech.com/w_2443,h_1374,ar_16:9,c_pad,q_auto,f_auto,dpr_1.0/d_transparent.gif/content/dam/logitech/en/products/mobility/crayon/gallery/update-may21/crayon-orange-gallery-1.png" }
+        };
+
+        // Level Configurations
+        const levels = {
+            1: {
+                tools: ['hand'],
+                cars: [
+                    { id: 'bat', type: 'battery', x: 1, y: 2, len: 2, dir: 'h', glued: false, damage: 0, screws: [] },
+                    { id: 'b1', type: 'blocker', x: 4, y: 1, len: 3, dir: 'v', style: '', glued: false, damage: 0, screws: [] }
+                ]
+            },
+            2: {
+                tools: ['hand', 'screwdriver'],
+                cars: [
+                    { id: 'bat', type: 'battery', x: 1, y: 2, len: 2, dir: 'h', glued: false, damage: 0, screws: [] },
+                    { id: 'b1', type: 'blocker', x: 4, y: 1, len: 3, dir: 'v', style: '', glued: false, damage: 0, screws: [
+                        { id: 's1', type: 'phillips', offsetX: 0.5, offsetY: 0.5, removed: false },
+                        { id: 's2', type: 'phillips', offsetX: 0.5, offsetY: 2.5, removed: false }
+                    ]}
+                ]
+            },
+            3: {
+                tools: ['hand', 'screwdriver', 'wrench', 'hammer'],
+                cars: [
+                    { id: 'bat', type: 'battery', x: 0, y: 2, len: 2, dir: 'h', glued: false, damage: 0, screws: [] },
+                    { id: 'b1', type: 'blocker', x: 3, y: 1, len: 3, dir: 'v', style: '', glued: false, damage: 0, screws: [
+                        { id: 's1', type: 'phillips', offsetX: 0.5, offsetY: 0.5, removed: false },
+                        { id: 's2', type: 'phillips', offsetX: 0.5, offsetY: 2.5, removed: false }
+                    ]},
+                    { id: 'b2', type: 'blocker', x: 4, y: 2, len: 2, dir: 'v', style: 'alt-1', glued: false, damage: 0, screws: [
+                        { id: 's3', type: 'bolt', offsetX: 0.5, offsetY: 1.5, removed: false }
+                    ]},
+                    { id: 'b3', type: 'blocker', x: 0, y: 3, len: 3, dir: 'h', style: 'alt-2', glued: false, damage: 0, screws: [] },
+                    { id: 'b4', type: 'blocker', x: 2, y: 4, len: 2, dir: 'h', style: 'alt-3', glued: false, damage: 0, screws: [] },
+                    { id: 'b5', type: 'blocker', x: 5, y: 0, len: 2, dir: 'v', style: 'alt-1', glued: false, damage: 0, screws: [] }
+                ]
+            },
+            4: {
+                tools: ['hand', 'screwdriver', 'wrench', 'hammer'], 
+                cars: [
+                    { id: 'bat', type: 'battery', x: 0, y: 2, len: 2, dir: 'h', glued: false, damage: 0, screws: [] },
+                    { id: 'b1', type: 'blocker', x: 3, y: 1, len: 2, dir: 'v', style: '', glued: false, damage: 0, screws: [
+                        { id: 's1', type: 'phillips', offsetX: 0.5, offsetY: 0.5, removed: false }
+                    ]},
+                    { id: 'b2', type: 'blocker', x: 2, y: 3, len: 2, dir: 'h', style: 'alt-1', glued: false, damage: 0, screws: [] },
+                    { id: 'b3', type: 'blocker', x: 0, y: 4, len: 2, dir: 'h', style: 'alt-2', glued: false, damage: 0, screws: [] },
+                    // This is the glued car blocking the exit path (exit is at row y=2, this covers y=1,2,3 at col x=4)
+                    { id: 'b_glued', type: 'blocker', x: 4, y: 1, len: 3, dir: 'v', style: 'alt-3', glued: true, damage: 0, screws: [] }
+                ]
+            }
+        };
+
+        // DOM Elements
+        const modal = document.getElementById('menu-modal');
+        const gameContainer = document.getElementById('game-container');
+        const board = document.getElementById('game-board');
+        const levelIndicator = document.getElementById('level-indicator');
+        const fireOverlay = document.getElementById('fire-overlay');
+        const winOverlay = document.getElementById('win-overlay');
+        const fireMessage = document.getElementById('fire-message');
+
+        function showMenu() {
+            gameState = 'menu';
+            modal.classList.remove('hidden');
+            gameContainer.classList.add('hidden');
+            fireOverlay.style.display = 'none';
+            winOverlay.style.display = 'none';
+        }
+
+        function restartLevel() {
+            startGame(currentCategory);
+            fireOverlay.style.display = 'none';
+            winOverlay.style.display = 'none';
+        }
+
+        function startGame(category) {
+            currentCategory = category;
+            gameState = 'playing';
+            
+            // Deep copy level data
+            cars = JSON.parse(JSON.stringify(levels[category].cars));
+            
+            // Setup UI
+            modal.classList.add('hidden');
+            gameContainer.classList.remove('hidden');
+            levelIndicator.innerText = `CATEGORY ${category}`;
+            
+            // Setup Tools
+            const availableTools = levels[category].tools;
+            ['hand', 'screwdriver', 'wrench', 'hammer'].forEach(tool => {
+                const btn = document.getElementById(`tool-${tool}`);
+                if (availableTools.includes(tool)) {
+                    btn.classList.remove('hidden');
+                } else {
+                    btn.classList.add('hidden');
+                }
+            });
+            selectTool('hand');
+            
+            renderBoard();
+        }
+
+        function selectTool(tool) {
+            if (gameState !== 'playing') return;
+            selectedTool = tool;
+            
+            // Update buttons visually
+            document.querySelectorAll('.tool-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById(`tool-${tool}`).classList.add('active');
+            
+            // Update board cursor
+            board.className = ''; // reset
+            board.classList.add(`cursor-${tool}`);
+        }
+
+        function renderBoard() {
+            // Clear existing cars
+            const existingCars = board.querySelectorAll('.car');
+            existingCars.forEach(c => c.remove());
+
+            // Render cars
+            cars.forEach(car => {
+                const el = document.createElement('div');
+                el.id = car.id;
+                el.className = `car ${car.type === 'battery' ? 'car-battery' : 'car-blocker ' + (car.style || '')}`;
+                
+                if (car.glued) el.classList.add('glued');
+                if (car.damage === 1) el.classList.add('damage-1');
+                if (car.damage === 2) el.classList.add('damage-2');
+
+                // Dimensions & Position
+                const w = car.dir === 'h' ? car.len * CELL_SIZE : CELL_SIZE;
+                const h = car.dir === 'v' ? car.len * CELL_SIZE : CELL_SIZE;
+                
+                // Gap adjustment so cars don't touch perfectly
+                const margin = 4;
+                el.style.width = `${w - margin*2}px`;
+                el.style.height = `${h - margin*2}px`;
+                el.style.left = `${car.x * CELL_SIZE + margin}px`;
+                el.style.top = `${car.y * CELL_SIZE + margin}px`;
+
+                // Add Battery visuals
+                if (car.type === 'battery') {
+                    el.innerHTML = `
+                        <div class="battery-label">±</div>
+                        <div class="battery-terminal"></div>
+                    `;
+                }
+
+                // Add Screws
+                car.screws.forEach(screw => {
+                    if (!screw.removed) {
+                        const sel = document.createElement('div');
+                        sel.className = `screw screw-${screw.type}`;
+                        // Center the screw in the targeted cell (screw is 26px, so half is 13)
+                        sel.style.left = `${(screw.offsetX * CELL_SIZE) - 13 - margin}px`;
+                        sel.style.top = `${(screw.offsetY * CELL_SIZE) - 13 - margin}px`;
+                        
+                        // Screw interaction
+                        sel.onmousedown = (e) => handleScrewClick(e, car, screw);
+                        sel.ontouchstart = (e) => { e.preventDefault(); handleScrewClick(e.touches[0], car, screw); };
+                        
+                        el.appendChild(sel);
+                    }
+                });
+
+                // Car Interaction
+                el.onmousedown = (e) => handleCarMouseDown(e, car);
+                el.ontouchstart = (e) => { e.preventDefault(); handleCarMouseDown(e.touches[0], car); };
+
+                board.appendChild(el);
+            });
+        }
+
+        function handleScrewClick(e, car, screw) {
+            e.stopPropagation(); // prevent car drag
+            if (gameState !== 'playing') return;
+
+            if (car.glued) {
+                triggerGameOver("Product cannot be safely recycled because components are glued. Using force caused a battery rupture!");
+                return;
+            }
+
+            if ((selectedTool === 'screwdriver' && screw.type === 'phillips') || 
+                (selectedTool === 'wrench' && screw.type === 'bolt')) {
+                screw.removed = true;
+                renderBoard(); // re-render to hide screw
+            } else if (selectedTool === 'hand') {
+                // Ignore, let them figure out they need a tool
+            } else if (selectedTool === 'hammer') {
+                // Hitting screw with hammer bubbles to hitting the car
+                handleCarMouseDown(e, car);
+            }
+        }
+
+        function handleCarMouseDown(e, car) {
+            if (gameState !== 'playing') return;
+
+            // --- Hammer Logic ---
+            if (selectedTool === 'hammer') {
+                if (currentCategory === 4) {
+                    // Any hammering in category 4 causes failure
+                    triggerGameOver("In glued assemblies, trying to smash parts apart near the battery causes a thermal runaway!");
+                    return;
+                }
+
+                if (car.type === 'battery') {
+                    triggerGameOver("You punctured the battery! Thermal runaway imminent!");
+                } else if (car.glued) {
+                    triggerGameOver("Product cannot be safely recycled because components are glued. Using force caused a battery rupture!");
+                } else {
+                    car.damage += 1;
+                    if (car.damage >= 3) {
+                        // Destroy car
+                        cars = cars.filter(c => c.id !== car.id);
+                    }
+                    renderBoard();
+                }
+                return;
+            }
+
+            // --- Drag Logic ---
+            if (selectedTool !== 'hand') return; // Must use hand to drag
+
+            if (car.glued) {
+                // Jiggle animation to show it's permanently stuck
+                const el = document.getElementById(car.id);
+                const axis = car.dir === 'h' ? 'X' : 'Y';
+                el.style.transform = `translate${axis}(4px)`;
+                setTimeout(() => el.style.transform = `translate${axis}(-4px)`, 50);
+                setTimeout(() => el.style.transform = `translate${axis}(0)`, 100);
+                return;
+            }
+
+            const hasScrews = car.screws.some(s => !s.removed);
+            if (hasScrews) {
+                // Jiggle animation to show it's stuck on the axis it would move
+                const el = document.getElementById(car.id);
+                const axis = car.dir === 'h' ? 'X' : 'Y';
+                el.style.transform = `translate${axis}(4px)`;
+                setTimeout(() => el.style.transform = `translate${axis}(-4px)`, 50);
+                setTimeout(() => el.style.transform = `translate${axis}(0)`, 100);
+                return;
+            }
+
+            // Start drag
+            isDragging = true;
+            activeCar = car;
+            dragStart = { x: e.clientX, y: e.clientY };
+            carStartPos = { x: car.x, y: car.y };
+            
+            // Bring to front
+            document.getElementById(car.id).style.zIndex = 10;
+        }
+
+        // Global Mouse Move / Up
+        window.addEventListener('mousemove', handleGlobalMove);
+        window.addEventListener('mouseup', handleGlobalUp);
+        window.addEventListener('touchmove', (e) => { if(isDragging) handleGlobalMove(e.touches[0]); }, {passive: false});
+        window.addEventListener('touchend', handleGlobalUp);
+
+        function handleGlobalMove(e) {
+            if (!isDragging || !activeCar || gameState !== 'playing') return;
+
+            const deltaX = e.clientX - dragStart.x;
+            const deltaY = e.clientY - dragStart.y;
+
+            const el = document.getElementById(activeCar.id);
+            const margin = 4;
+
+            // Calculate Grid Bounds based on other cars
+            let minX = 0, maxX = GRID_SIZE - activeCar.len;
+            let minY = 0, maxY = GRID_SIZE - activeCar.len;
+
+            // Allow battery to exit board on the right
+            if (activeCar.type === 'battery' && activeCar.y === 2) {
+                maxX = GRID_SIZE; // Can slide off visually
+            }
+
+            cars.forEach(other => {
+                if (other.id === activeCar.id) return;
+                
+                if (activeCar.dir === 'h') {
+                    // Check horizontal collisions
+                    if (other.y < activeCar.y + 1 && other.y + (other.dir==='v'?other.len:1) > activeCar.y) {
+                        if (other.x > activeCar.x) maxX = Math.min(maxX, other.x - activeCar.len);
+                        if (other.x < activeCar.x) minX = Math.max(minX, other.x + (other.dir==='h'?other.len:1));
+                    }
+                } else {
+                    // Check vertical collisions
+                    if (other.x < activeCar.x + 1 && other.x + (other.dir==='h'?other.len:1) > activeCar.x) {
+                        if (other.y > activeCar.y) maxY = Math.min(maxY, other.y - activeCar.len);
+                        if (other.y < activeCar.y) minY = Math.max(minY, other.y + (other.dir==='v'?other.len:1));
+                    }
+                }
+            });
+
+            // Calculate new visual position and clamp
+            if (activeCar.dir === 'h') {
+                let newPixelX = (carStartPos.x * CELL_SIZE) + deltaX;
+                const minPixelX = minX * CELL_SIZE;
+                const maxPixelX = maxX * CELL_SIZE;
+                newPixelX = Math.max(minPixelX, Math.min(newPixelX, maxPixelX));
+                el.style.left = `${newPixelX + margin}px`;
+                
+                // Track logical position continuously for win detection
+                activeCar.x = newPixelX / CELL_SIZE; 
+            } else {
+                let newPixelY = (carStartPos.y * CELL_SIZE) + deltaY;
+                const minPixelY = minY * CELL_SIZE;
+                const maxPixelY = maxY * CELL_SIZE;
+                newPixelY = Math.max(minPixelY, Math.min(newPixelY, maxPixelY));
+                el.style.top = `${newPixelY + margin}px`;
+                activeCar.y = newPixelY / CELL_SIZE;
+            }
+        }
+
+        function handleGlobalUp() {
+            if (!isDragging || !activeCar) return;
+            
+            // Snap to nearest integer grid coordinate
+            if (activeCar.dir === 'h') {
+                activeCar.x = Math.round(activeCar.x);
+            } else {
+                activeCar.y = Math.round(activeCar.y);
+            }
+
+            isDragging = false;
+            document.getElementById(activeCar.id).style.zIndex = 1;
+
+            // Check Win Condition
+            if (activeCar.type === 'battery' && activeCar.x + activeCar.len >= GRID_SIZE) {
+                // Snap it completely off screen for visual satisfaction
+                document.getElementById(activeCar.id).style.left = `${GRID_SIZE * CELL_SIZE + 20}px`;
+                triggerWin();
+            } else {
+                renderBoard(); // re-render to snap perfectly
+            }
+            
+            activeCar = null;
+        }
+
+        function triggerGameOver(msg) {
+            gameState = 'over';
+            fireMessage.innerText = msg;
+            
+            // Populate Product Data
+            document.getElementById('fail-product-img').src = categoryProducts[currentCategory].img;
+            document.getElementById('fail-product-name').innerText = categoryProducts[currentCategory].name;
+            
+            fireOverlay.style.display = 'flex';
+        }
+
+        function triggerWin() {
+            gameState = 'won';
+            
+            // Populate Product Data
+            document.getElementById('win-product-img').src = categoryProducts[currentCategory].img;
+            document.getElementById('win-product-name').innerText = categoryProducts[currentCategory].name;
+
+            setTimeout(() => {
+                winOverlay.style.display = 'flex';
+            }, 300); // slight delay to let it slide out
+        }
+
+        // Initialize Menu on load
+        showMenu();
+
+    </script>
+</body>
+</html>
+</textarea>
+
+    <!-- Application Logic -->
+    <script>
+        // --- Modal Loading ---
+        const overlay = document.getElementById('modalOverlay');
+        const modals = document.querySelectorAll('.modal-content');
+
+        function openModal(phaseId) {
+            modals.forEach(m => { m.classList.add('hidden'); m.classList.remove('modal-enter'); });
+            overlay.classList.remove('hidden');
+            setTimeout(() => { overlay.classList.remove('opacity-0'); }, 10);
+            
+            const targetModal = document.getElementById(`modal-${phaseId}`);
+            if (targetModal) {
+                targetModal.classList.remove('hidden');
+                setTimeout(() => targetModal.classList.add('modal-enter'), 10);
+            }
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal() {
+            overlay.classList.add('opacity-0');
+            setTimeout(() => { 
+                overlay.classList.add('hidden'); 
+                document.body.style.overflow = 'auto';
+            }, 300);
+        }
+
+        function closeModalOnOutsideClick(event) { if (event.target === overlay) closeModal(); }
+
+        // --- IFrame Modal Logic ---
+        const iframeOverlay = document.getElementById('iframeModal');
+        const externalIframe = document.getElementById('externalIframe');
+
+        function openIframe(url) {
+            externalIframe.style.opacity = '0'; 
+            externalIframe.src = url;
+            iframeOverlay.classList.remove('hidden');
+            setTimeout(() => { iframeOverlay.classList.remove('opacity-0'); }, 10);
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeIframe() {
+            iframeOverlay.classList.add('opacity-0');
+            setTimeout(() => { 
+                iframeOverlay.classList.add('hidden'); 
+                externalIframe.src = ''; 
+                
+                if(overlay.classList.contains('hidden') && gameOverlay.classList.contains('hidden')) {
+                    document.body.style.overflow = 'auto';
+                }
+            }, 300);
+        }
+
+        function closeIframeOnOutsideClick(event) { if (event.target === iframeOverlay) closeIframe(); }
+
+        // IFrame Browser Controls
+        function iframeGoBack() {
+            try { externalIframe.contentWindow.history.back(); } 
+            catch (e) { console.warn("Cross-origin security prevents accessing iframe history directly."); }
+        }
+        function iframeGoForward() {
+            try { externalIframe.contentWindow.history.forward(); } 
+            catch (e) { console.warn("Cross-origin security prevents accessing iframe history directly."); }
+        }
+        function iframeRefresh() {
+            externalIframe.style.opacity = '0';
+            setTimeout(() => { externalIframe.src = externalIframe.src; }, 50);
+        }
+        function iframeOpenNew() {
+            window.open(externalIframe.src, '_blank');
+        }
+
+        // --- Game Modal Logic ---
+        const gameOverlay = document.getElementById('gameModal');
+        const gameIframe = document.getElementById('gameIframe');
+
+        function openGame() {
+            // Load the raw game code from the hidden textarea into a local blob url
+            const rawGameCode = document.getElementById('game-source-code').value;
+            const blob = new Blob([rawGameCode], {type: 'text/html'});
+            gameIframe.src = URL.createObjectURL(blob);
+            
+            gameOverlay.classList.remove('hidden');
+            setTimeout(() => { gameOverlay.classList.remove('opacity-0'); }, 10);
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeGame() {
+            gameOverlay.classList.add('opacity-0');
+            setTimeout(() => { 
+                gameOverlay.classList.add('hidden'); 
+                gameIframe.src = ''; // completely stops the game engine/intervals
+                
+                if(overlay.classList.contains('hidden') && iframeOverlay.classList.contains('hidden')) {
+                    document.body.style.overflow = 'auto';
+                }
+            }, 300);
+        }
+
+        function closeGameOnOutsideClick(event) { if (event.target === gameOverlay) closeGame(); }
+
+        // Global Escape Key Handler for all Modals
+        document.addEventListener('keydown', e => { 
+            if (e.key === "Escape") {
+                if(!gameOverlay.classList.contains('hidden')) {
+                    closeGame();
+                } else if(!iframeOverlay.classList.contains('hidden')) {
+                    closeIframe();
+                } else if(!overlay.classList.contains('hidden')) {
+                    closeModal();
+                }
+            } 
+        });
+
+        // --- Data Source ---
+        const lcaData = [
+            { name: "Logitech", s: 64, d: 18, u: 13, e: 5 },
+            { name: "PWS", s: 80, d: 10, u: 5, e: 5 },
+            { name: "Gaming", s: 55, d: 15, u: 25, e: 5 },
+            { name: "TWS", s: 40, d: 5, u: 50, e: 5 },
+            { name: "MX Master 4", s: 80, d: 10, u: 3, e: 7 },
+            { name: "PRO X SUPERLIGHT 2", s: 57, d: 19, u: 18, e: 6 },
+            { name: "MX Keys S", s: 55, d: 26, u: 14, e: 5 },
+            { name: "G915 X LIGHTSPEED", s: 84, d: 9, u: 2, e: 5 },
+            { name: "Zone 300 Headset", s: 68, d: 21, u: 5, e: 6 },
+            { name: "G733", s: 74, d: 4, u: 18, e: 4 },
+            { name: "Brio 500", s: 60, d: 7, u: 32, e: 1 },
+            { name: "Combo Touch", s: 70, d: 24, u: 1, e: 5 },
+            { name: "Rally Bar", s: 38, d: 2, u: 59, e: 1 },
+            { name: "PRO Racing Wheel", s: 41, d: 7, u: 49, e: 3 }
+        ];
+
+        // --- Explore Menu Setup ---
+        let currentIndex = 0;
+
+        function renderOptions() {
+            const row1 = document.getElementById('options-row-1');
+            const row2 = document.getElementById('options-row-2');
+            row1.innerHTML = ''; row2.innerHTML = '';
+            
+            lcaData.forEach((data, index) => {
+                const btn = document.createElement('button');
+                btn.innerText = data.name;
+                
+                const baseClasses = "px-3 py-1.5 md:px-4 md:py-2 rounded-xl font-bold text-[11px] md:text-sm transition-colors duration-300 border border-transparent whitespace-nowrap";
+                if (index === currentIndex) {
+                    btn.className = `${baseClasses} bg-brand-teal text-brand-darkGreen shadow-md z-10`;
+                } else {
+                    btn.className = `${baseClasses} bg-white text-brand-black/70 hover:bg-brand-lightGreen hover:text-brand-darkGreen border-brand-lightGray/50`;
+                }
+                
+                btn.onclick = () => {
+                    currentIndex = index;
+                    renderOptions();
+                    updateDataEngine(index);
+                };
+
+                if (index < 4) row1.appendChild(btn);
+                else row2.appendChild(btn);
+            });
+        }
+
+        // --- Custom Vanilla JS Physics Engine ---
+        let bubbleNodes = [
+            { id: 'sourcing', title: 'Sourcing & Manufacture', sub: 'Impact of making our products', val: 0, currentR: 0, targetR: 0, layoutR: 0, cLight: '#E6D9FF', cDark: '#32156D', currentX: 0, currentY: 0, targetX: 0, targetY: 0, isHovered: false },
+            { id: 'dist', title: 'Distribution', sub: 'Impact of getting our products to consumers', val: 0, currentR: 0, targetR: 0, layoutR: 0, cLight: '#D5DDFF', cDark: '#3A4A87', currentX: 0, currentY: 0, targetX: 0, targetY: 0, isHovered: false },
+            { id: 'use', title: 'Consumer Use', sub: 'Impact of using our products', val: 0, currentR: 0, targetR: 0, layoutR: 0, cLight: '#BFC8DB', cDark: '#313A49', currentX: 0, currentY: 0, targetX: 0, targetY: 0, isHovered: false },
+            { id: 'eol', title: 'End of Life', sub: 'Impact of disposing of our products', val: 0, currentR: 0, targetR: 0, layoutR: 0, cLight: '#FFC6CD', cDark: '#A3001A', currentX: 0, currentY: 0, targetX: 0, targetY: 0, isHovered: false }
+        ];
+
+        let width = 0, height = 0, centerY = 0;
+        const bubbleLayer = document.getElementById('bubble-layer');
+        let isEngineRunning = false;
+        let isFirstLoad = true;
+        
+        function initBubbles() {
+            bubbleNodes.forEach((node, i) => {
+                const circle = document.createElement('button');
+                circle.id = `circle-${node.id}`;
+                circle.className = `bubble-node absolute rounded-full pointer-events-auto border border-brand-black/5`;
+                circle.style.backgroundColor = node.cLight;
+                
+                // Track hovers directly in JS for flawless scaling physics
+                circle.onmouseenter = () => node.isHovered = true;
+                circle.onmouseleave = () => node.isHovered = false;
+                circle.onclick = () => openModal(node.id === 'dist' ? 'distribution' : node.id);
+                bubbleLayer.appendChild(circle);
+
+                const label = document.createElement('div');
+                label.id = `label-${node.id}`;
+                label.className = `bubble-label absolute pointer-events-none flex flex-col justify-center z-[60]`;
+                label.innerHTML = `
+                    <div class="inner-text-wrapper text-center w-full flex flex-col items-center justify-center pointer-events-none origin-center">
+                        <span class="pct text-4xl md:text-5xl lg:text-6xl font-black leading-none tracking-tighter" style="color: ${node.cDark}">${node.val}%</span>
+                        <h2 class="title text-sm md:text-base lg:text-lg font-bold leading-tight mt-1 px-2" style="color: ${node.cDark}">${node.title}</h2>
+                        <p class="sub text-[10px] md:text-[11px] lg:text-sm font-medium opacity-80 leading-tight mt-1 px-4 hidden sm:block" style="color: ${node.cDark}">${node.sub}</p>
+                    </div>
+                `;
+                bubbleLayer.appendChild(label);
+            });
+
+            if (!isEngineRunning) {
+                isEngineRunning = true;
+                requestAnimationFrame(physicsLoop);
+            }
+        }
+
+        function updateDataEngine(index) {
+            const data = lcaData[index];
+            
+            // UI Updates
+            document.getElementById('modal-val-sourcing').innerText = data.s + '% of Impact';
+            document.getElementById('modal-val-dist').innerText = data.d + '% of Impact';
+            document.getElementById('modal-val-use').innerText = data.u + '% of Impact';
+            document.getElementById('modal-val-eol').innerText = data.e + '% of Impact';
+
+            // Mathematical Bubble Sizing
+            const MIN_PCT = 10; 
+            let items = [
+                { id: 'sourcing', val: Math.max(data.s, MIN_PCT) },
+                { id: 'dist', val: Math.max(data.d, MIN_PCT) },
+                { id: 'use', val: Math.max(data.u, MIN_PCT) },
+                { id: 'eol', val: Math.max(data.e, MIN_PCT) }
+            ];
+            let sum = items.reduce((acc, i) => acc + i.val, 0);
+
+            bubbleNodes.forEach(node => {
+                let pct = items.find(i => i.id === node.id).val / sum;
+                node.baseWeight = Math.pow(pct, 0.65); 
+                
+                if(node.id === 'sourcing') node.val = data.s;
+                if(node.id === 'dist') node.val = data.d;
+                if(node.id === 'use') node.val = data.u;
+                if(node.id === 'eol') node.val = data.e;
+                
+                const label = document.getElementById(`label-${node.id}`);
+                if (label) {
+                    label.querySelector('.pct').innerText = node.val + '%';
+                }
+            });
+
+            // Target sizes calculated continuously in physics loop to be strictly immune to layout shifts
+        }
+
+        // Custom Butter-Smooth Physics Engine
+        function physicsLoop() {
+            const time = Date.now() * 0.0015;
+
+            // Recalculate dimensions dynamically every frame. 
+            // This guarantees bubbles center perfectly on the exact frame the fonts load!
+            width = document.getElementById('chart-container').clientWidth;
+            height = document.getElementById('chart-container').clientHeight;
+            centerY = (height - 60) / 2;
+
+            if (isFirstLoad) {
+                bubbleNodes.forEach(node => {
+                    node.currentY = centerY;
+                    node.targetY = centerY;
+                });
+                isFirstLoad = false;
+            }
+
+            // Continuously resize targets based on live container width
+            let totalWeight = bubbleNodes.reduce((a, node) => a + node.baseWeight, 0);
+            let targetTotalWidth = width * 0.85;
+
+            let maxWeight = Math.max(...bubbleNodes.map(n => n.baseWeight));
+            let hypotheticalMaxRadius = (maxWeight / totalWeight) * targetTotalWidth / 2;
+            let maxAllowedRadius = (height - 80) * 0.45; 
+            
+            if (hypotheticalMaxRadius > maxAllowedRadius) {
+                let reductionRatio = maxAllowedRadius / hypotheticalMaxRadius;
+                targetTotalWidth *= reductionRatio;
+            }
+
+            bubbleNodes.forEach(node => {
+                node.targetR = (node.baseWeight / totalWeight) * targetTotalWidth / 2;
+            });
+
+            // 1. Update Radii
+            bubbleNodes.forEach((d) => {
+                // actualTargetR visually expands the bubble bubble on hover
+                let actualTargetR = d.isHovered ? d.targetR * 1.05 : d.targetR;
+                d.currentR += (actualTargetR - d.currentR) * 0.08;
+                
+                // layoutR is entirely immune to hover states. 
+                // This ensures text box width & font scaling stays rock solid!
+                if(d.layoutR === 0) d.layoutR = d.targetR;
+                d.layoutR += (d.targetR - d.layoutR) * 0.08;
+            });
+
+            // 2. Guarantee 100% Touching Alignment
+            let totalCurrentWidth = bubbleNodes.reduce((sum, d) => sum + (d.currentR * 2), 0);
+            let currentXPos = (width - totalCurrentWidth) / 2;
+
+            bubbleNodes.forEach((d, i) => {
+                // X Axis
+                d.targetX = currentXPos + d.currentR;
+                currentXPos += d.currentR * 2;
+                d.currentX += (d.targetX - d.currentX) * 0.1;
+
+                // Y Axis: Subtle Wobble
+                d.targetY = centerY + Math.sin(time + i * 1.5) * 5;
+                d.currentY += (d.targetY - d.currentY) * 0.1;
+
+                // 3. Hardware Accelerated DOM Updates
+                const circle = document.getElementById(`circle-${d.id}`);
+                if(circle) {
+                    circle.style.width = `${d.currentR * 2}px`;
+                    circle.style.height = `${d.currentR * 2}px`;
+                    circle.style.transform = `translate3d(${d.currentX - d.currentR}px, ${d.currentY - d.currentR}px, 0)`;
+                }
+
+                const label = document.getElementById(`label-${d.id}`);
+                if(label) {
+                    const innerWrapper = label.querySelector('.inner-text-wrapper');
+                    
+                    // Anchoring label width to layoutR instead of currentR ensures text won't reflow on hover
+                    label.style.width = `${d.layoutR * 1.85}px`;
+                    label.style.transform = `translate3d(${d.currentX}px, ${d.currentY}px, 0) translate(-50%, -50%)`;
+                    
+                    const scaleFactor = Math.min(1, d.layoutR / 100);
+                    innerWrapper.style.transform = `scale(${scaleFactor})`;
+                }
+            });
+
+            requestAnimationFrame(physicsLoop);
+        }
+
+        // --- Safe DOM Initialization ---
+        window.addEventListener("load", () => {
+            initBubbles();
+            renderOptions();
+            updateDataEngine(0);
+        });
+    </script>
+</body>
+</html>
