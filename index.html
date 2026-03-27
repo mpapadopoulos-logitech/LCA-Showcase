@@ -7,6 +7,7 @@
     <!-- Import Retro Font for Game Button -->
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
     <script>
         tailwind.config = {
             theme: {
@@ -132,12 +133,19 @@
         <!-- 1. Sourcing & Manufacture Modal -->
         <div id="modal-sourcing" class="modal-content hidden w-full max-w-7xl h-[90vh] bg-phase-sourcingLight text-phase-sourcingDark rounded-[2rem] shadow-2xl relative flex flex-col overflow-hidden">
             <div class="flex-shrink-0 flex justify-between items-start p-8 md:p-10 pb-4">
-                <div>
-                    <h2 class="text-4xl md:text-5xl font-bold mb-2">Sourcing & Manufacture</h2>
-                    <p class="text-xl opacity-90 font-medium mb-4">Impact of making our products</p>
-                    <span id="modal-val-sourcing" class="inline-block bg-phase-sourcingDark text-white px-4 py-2 rounded-full font-bold text-xl"></span>
+                <div class="flex-grow flex flex-col md:flex-row md:items-start justify-between gap-4 mr-4">
+                    <div>
+                        <h2 class="text-4xl md:text-5xl font-bold mb-2">Sourcing & Manufacture</h2>
+                        <p class="text-xl opacity-90 font-medium mb-4">Impact of making our products</p>
+                        <span id="modal-val-sourcing" class="inline-block bg-phase-sourcingDark text-white px-4 py-2 rounded-full font-bold text-xl"></span>
+                    </div>
+                    <!-- Launch PCB Game Retro Button -->
+                    <button onclick="openGame('game-source-pcb', 'PCB OPTIMIZER OS')" class="flex-shrink-0 bg-brand-black hover:bg-brand-teal hover:text-brand-darkGreen text-white font-retro text-[10px] md:text-xs px-4 py-3 rounded border-b-4 border-r-4 border-gray-600 hover:border-brand-darkGreen flex items-center gap-3 shadow-md transition-all active:border-b-0 active:border-r-0 active:translate-y-1 active:translate-x-1 focus:outline-none md:mt-2">
+                        <span class="text-xl md:text-2xl leading-none">🎮</span> 
+                        <span class="leading-tight text-left">LAUNCH<br>PCB OPTIMIZER</span>
+                    </button>
                 </div>
-                <button onclick="closeModal()" class="bg-white/50 hover:bg-white text-phase-sourcingDark rounded-full p-3 transition-colors focus:outline-none">
+                <button onclick="closeModal()" class="bg-white/50 hover:bg-white text-phase-sourcingDark rounded-full p-3 transition-colors focus:outline-none flex-shrink-0">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
                 </button>
             </div>
@@ -255,7 +263,7 @@
                         <span id="modal-val-eol" class="inline-block bg-phase-eolDark text-white px-4 py-2 rounded-full font-bold text-xl"></span>
                     </div>
                     <!-- Launch Game Retro Button -->
-                    <button onclick="openGame()" class="flex-shrink-0 bg-brand-black hover:bg-brand-teal hover:text-brand-darkGreen text-white font-retro text-[10px] md:text-xs px-4 py-3 rounded border-b-4 border-r-4 border-gray-600 hover:border-brand-darkGreen flex items-center gap-3 shadow-md transition-all active:border-b-0 active:border-r-0 active:translate-y-1 active:translate-x-1 focus:outline-none md:mt-2">
+                    <button onclick="openGame('game-source-battery', 'BATTERY RESCUE OS')" class="flex-shrink-0 bg-brand-black hover:bg-brand-teal hover:text-brand-darkGreen text-white font-retro text-[10px] md:text-xs px-4 py-3 rounded border-b-4 border-r-4 border-gray-600 hover:border-brand-darkGreen flex items-center gap-3 shadow-md transition-all active:border-b-0 active:border-r-0 active:translate-y-1 active:translate-x-1 focus:outline-none md:mt-2">
                         <span class="text-xl md:text-2xl leading-none">🎮</span> 
                         <span class="leading-tight text-left">LAUNCH<br>BATTERY RESCUE</span>
                     </button>
@@ -410,14 +418,14 @@
         </div>
     </div>
 
-    <!-- Battery Rescue Game Modal Overlay -->
+    <!-- Game Modal Overlay -->
     <div id="gameModal" class="fixed inset-0 bg-brand-black/90 backdrop-blur-sm z-[100] hidden opacity-0 transition-opacity duration-300 flex items-center justify-center p-4 md:p-8" onclick="closeGameOnOutsideClick(event)">
         <div class="bg-[#1a202c] w-full max-w-5xl h-full md:h-[85vh] rounded-[1.5rem] shadow-2xl relative flex flex-col overflow-hidden border-4 border-gray-600">
             <!-- Header & Controls -->
             <div class="flex-shrink-0 flex justify-between items-center p-3 md:p-4 border-b border-gray-700 bg-gray-800">
                 <div class="flex items-center gap-3">
                     <span class="text-xl leading-none">🎮</span>
-                    <h2 class="text-xs md:text-sm font-retro text-green-400 truncate tracking-widest mt-1">BATTERY RESCUE OS</h2>
+                    <h2 id="game-modal-title" class="text-xs md:text-sm font-retro text-green-400 truncate tracking-widest mt-1">OS BOOT</h2>
                 </div>
                 <button onclick="closeGame()" class="bg-gray-700 hover:bg-gray-600 text-white rounded p-2 transition-colors focus:outline-none border-b-2 border-gray-900 active:border-0 active:translate-y-px">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"></path></svg>
@@ -430,8 +438,8 @@
         </div>
     </div>
 
-    <!-- Safe Raw Game Data Storage -->
-    <textarea id="game-source-code" style="display:none;">
+    <!-- Safe Raw Game Data Storage (Battery Rescue) -->
+    <textarea id="game-source-battery" style="display:none;">
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -1209,405 +1217,1449 @@
 </html>
 </textarea>
 
-    <!-- Application Logic -->
-    <script>
-        // --- Modal Loading ---
-        const overlay = document.getElementById('modalOverlay');
-        const modals = document.querySelectorAll('.modal-content');
+    <!-- Safe Raw PCB Game Data Storage -->
+    <textarea id="game-source-pcb" style="display:none;">
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PCB Yield Optimizer</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Custom Fonts & Animations */
+        @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Roboto+Mono:wght@400;700&display=swap');
 
-        function openModal(phaseId) {
-            modals.forEach(m => { m.classList.add('hidden'); m.classList.remove('modal-enter'); });
-            overlay.classList.remove('hidden');
-            setTimeout(() => { overlay.classList.remove('opacity-0'); }, 10);
-            
-            const targetModal = document.getElementById(`modal-${phaseId}`);
-            if (targetModal) {
-                targetModal.classList.remove('hidden');
-                setTimeout(() => targetModal.classList.add('modal-enter'), 10);
-            }
-            document.body.style.overflow = 'hidden';
+        body {
+            font-family: 'Roboto Mono', monospace;
+            background-color: #0b1120; /* Very dark slate */
+            color: #e2e8f0;
+            user-select: none;
+            overflow: hidden;
+            /* Concept 1: Motherboard Background */
+            background-image: 
+                radial-gradient(circle at 40px 40px, rgba(16, 185, 129, 0.3) 2px, transparent 3px), /* Vias */
+                radial-gradient(circle at 140px 140px, rgba(16, 185, 129, 0.3) 2px, transparent 3px),
+                linear-gradient(0deg, transparent 39px, rgba(16, 185, 129, 0.08) 40px, transparent 41px), /* Traces */
+                linear-gradient(90deg, transparent 39px, rgba(16, 185, 129, 0.08) 40px, transparent 41px),
+                linear-gradient(45deg, transparent 59px, rgba(16, 185, 129, 0.05) 60px, transparent 61px);
+            background-size: 100px 100px, 100px 100px, 40px 40px, 40px 40px, 85px 85px;
         }
 
-        function closeModal() {
-            overlay.classList.add('opacity-0');
-            setTimeout(() => { 
-                overlay.classList.add('hidden'); 
-                document.body.style.overflow = 'auto';
-            }, 300);
+        h1, h2, h3, .retro-text {
+            font-family: 'Press Start 2P', cursive;
+            text-transform: uppercase;
         }
 
-        function closeModalOnOutsideClick(event) { if (event.target === overlay) closeModal(); }
-
-        // --- IFrame Modal Logic ---
-        const iframeOverlay = document.getElementById('iframeModal');
-        const externalIframe = document.getElementById('externalIframe');
-
-        function openIframe(url) {
-            externalIframe.style.opacity = '0'; 
-            externalIframe.src = url;
-            iframeOverlay.classList.remove('hidden');
-            setTimeout(() => { iframeOverlay.classList.remove('opacity-0'); }, 10);
-            document.body.style.overflow = 'hidden';
+        /* PCB Board Grid (5x8) */
+        #game-board {
+            width: 200px; /* 5 columns */
+            height: 320px; /* 8 rows */
+            background-color: #065f46; /* PCB Green */
+            background-image: 
+                linear-gradient(rgba(52, 211, 153, 0.25) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(52, 211, 153, 0.25) 1px, transparent 1px);
+            background-size: 40px 40px; /* grid of 40px cells */
+            border: 4px solid #047857;
+            border-radius: 6px;
+            position: relative;
+            box-shadow: 0 0 20px rgba(16, 185, 129, 0.15);
         }
 
-        function closeIframe() {
-            iframeOverlay.classList.add('opacity-0');
-            setTimeout(() => { 
-                iframeOverlay.classList.add('hidden'); 
-                externalIframe.src = ''; 
-                
-                if(overlay.classList.contains('hidden') && gameOverlay.classList.contains('hidden')) {
-                    document.body.style.overflow = 'auto';
-                }
-            }, 300);
+        /* Concept 2: Fiducial Markers */
+        .fiducial {
+            position: absolute;
+            width: 12px; height: 12px;
+            border: 2px solid #fbbf24;
+            border-radius: 50%;
+            z-index: 1;
+            opacity: 0.8;
+            pointer-events: none;
+        }
+        .fiducial::after {
+            content: ''; position: absolute;
+            top: 50%; left: 50%; transform: translate(-50%, -50%);
+            width: 4px; height: 4px;
+            background-color: #fbbf24;
+            border-radius: 50%;
         }
 
-        function closeIframeOnOutsideClick(event) { if (event.target === iframeOverlay) closeIframe(); }
-
-        // IFrame Browser Controls
-        function iframeGoBack() {
-            try { externalIframe.contentWindow.history.back(); } 
-            catch (e) { console.warn("Cross-origin security prevents accessing iframe history directly."); }
-        }
-        function iframeGoForward() {
-            try { externalIframe.contentWindow.history.forward(); } 
-            catch (e) { console.warn("Cross-origin security prevents accessing iframe history directly."); }
-        }
-        function iframeRefresh() {
-            externalIframe.style.opacity = '0';
-            setTimeout(() => { externalIframe.src = externalIframe.src; }, 50);
-        }
-        function iframeOpenNew() {
-            window.open(externalIframe.src, '_blank');
+        /* Dispenser Box */
+        #dispenser-box {
+            width: 200px; /* Matches tool shelf */
+            height: 160px;
+            background-color: #1e293b;
+            border: 3px dashed #475569;
+            border-radius: 12px;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
-        // --- Game Modal Logic ---
-        const gameOverlay = document.getElementById('gameModal');
-        const gameIframe = document.getElementById('gameIframe');
-
-        function openGame() {
-            // Load the raw game code from the hidden textarea into a local blob url
-            const rawGameCode = document.getElementById('game-source-code').value;
-            const blob = new Blob([rawGameCode], {type: 'text/html'});
-            gameIframe.src = URL.createObjectURL(blob);
-            
-            gameOverlay.classList.remove('hidden');
-            setTimeout(() => { gameOverlay.classList.remove('opacity-0'); }, 10);
-            document.body.style.overflow = 'hidden';
+        /* PCB Pieces */
+        .pcb-piece {
+            position: absolute;
+            transition: transform 0.15s ease-in-out;
+            cursor: grab;
+            z-index: 10;
         }
-
-        function closeGame() {
-            gameOverlay.classList.add('opacity-0');
-            setTimeout(() => { 
-                gameOverlay.classList.add('hidden'); 
-                gameIframe.src = ''; // completely stops the game engine/intervals
-                
-                if(overlay.classList.contains('hidden') && iframeOverlay.classList.contains('hidden')) {
-                    document.body.style.overflow = 'auto';
-                }
-            }, 300);
+        .pcb-piece:active {
+            cursor: grabbing;
+            z-index: 50;
         }
-
-        function closeGameOnOutsideClick(event) { if (event.target === gameOverlay) closeGame(); }
-
-        // Global Escape Key Handler for all Modals
-        document.addEventListener('keydown', e => { 
-            if (e.key === "Escape") {
-                if(!gameOverlay.classList.contains('hidden')) {
-                    closeGame();
-                } else if(!iframeOverlay.classList.contains('hidden')) {
-                    closeIframe();
-                } else if(!overlay.classList.contains('hidden')) {
-                    closeModal();
-                }
-            } 
-        });
-
-        // --- Data Source ---
-        const lcaData = [
-            { name: "Logitech", s: 64, d: 18, u: 13, e: 5 },
-            { name: "PWS", s: 80, d: 10, u: 5, e: 5 },
-            { name: "Gaming", s: 55, d: 15, u: 25, e: 5 },
-            { name: "TWS", s: 40, d: 5, u: 50, e: 5 },
-            { name: "MX Master 4", s: 80, d: 10, u: 3, e: 7 },
-            { name: "PRO X SUPERLIGHT 2", s: 57, d: 19, u: 18, e: 6 },
-            { name: "MX Keys S", s: 55, d: 26, u: 14, e: 5 },
-            { name: "G915 X LIGHTSPEED", s: 84, d: 9, u: 2, e: 5 },
-            { name: "Zone 300 Headset", s: 68, d: 21, u: 5, e: 6 },
-            { name: "G733", s: 74, d: 4, u: 18, e: 4 },
-            { name: "Brio 500", s: 60, d: 7, u: 32, e: 1 },
-            { name: "Combo Touch", s: 70, d: 24, u: 1, e: 5 },
-            { name: "Rally Bar", s: 38, d: 2, u: 59, e: 1 },
-            { name: "PRO Racing Wheel", s: 41, d: 7, u: 49, e: 3 }
-        ];
-
-        // --- Explore Menu Setup ---
-        let currentIndex = 0;
-
-        function renderOptions() {
-            const row1 = document.getElementById('options-row-1');
-            const row2 = document.getElementById('options-row-2');
-            row1.innerHTML = ''; row2.innerHTML = '';
-            
-            lcaData.forEach((data, index) => {
-                const btn = document.createElement('button');
-                btn.innerText = data.name;
-                
-                const baseClasses = "px-3 py-1.5 md:px-4 md:py-2 rounded-xl font-bold text-[11px] md:text-sm transition-colors duration-300 border border-transparent whitespace-nowrap";
-                if (index === currentIndex) {
-                    btn.className = `${baseClasses} bg-brand-teal text-brand-darkGreen shadow-md z-10`;
-                } else {
-                    btn.className = `${baseClasses} bg-white text-brand-black/70 hover:bg-brand-lightGreen hover:text-brand-darkGreen border-brand-lightGray/50`;
-                }
-                
-                btn.onclick = () => {
-                    currentIndex = index;
-                    renderOptions();
-                    updateDataEngine(index);
-                };
-
-                if (index < 4) row1.appendChild(btn);
-                else row2.appendChild(btn);
-            });
-        }
-
-        // --- Custom Vanilla JS Physics Engine ---
-        let bubbleNodes = [
-            { id: 'sourcing', title: 'Sourcing & Manufacture', sub: 'Impact of making our products', val: 0, currentR: 0, targetR: 0, layoutR: 0, cLight: '#E6D9FF', cDark: '#32156D', currentX: 0, currentY: 0, targetX: 0, targetY: 0, isHovered: false },
-            { id: 'dist', title: 'Distribution', sub: 'Impact of getting our products to consumers', val: 0, currentR: 0, targetR: 0, layoutR: 0, cLight: '#D5DDFF', cDark: '#3A4A87', currentX: 0, currentY: 0, targetX: 0, targetY: 0, isHovered: false },
-            { id: 'use', title: 'Consumer Use', sub: 'Impact of using our products', val: 0, currentR: 0, targetR: 0, layoutR: 0, cLight: '#BFC8DB', cDark: '#313A49', currentX: 0, currentY: 0, targetX: 0, targetY: 0, isHovered: false },
-            { id: 'eol', title: 'End of Life', sub: 'Impact of disposing of our products', val: 0, currentR: 0, targetR: 0, layoutR: 0, cLight: '#FFC6CD', cDark: '#A3001A', currentX: 0, currentY: 0, targetX: 0, targetY: 0, isHovered: false }
-        ];
-
-        let width = 0, height = 0, centerY = 0;
-        const bubbleLayer = document.getElementById('bubble-layer');
-        let isEngineRunning = false;
-        let isFirstLoad = true;
         
-        function initBubbles() {
-            bubbleNodes.forEach((node, i) => {
-                const circle = document.createElement('button');
-                circle.id = `circle-${node.id}`;
-                circle.className = `bubble-node absolute rounded-full pointer-events-auto border border-brand-black/5`;
-                circle.style.backgroundColor = node.cLight;
-                
-                // Track hovers directly in JS for flawless scaling physics
-                circle.onmouseenter = () => node.isHovered = true;
-                circle.onmouseleave = () => node.isHovered = false;
-                circle.onclick = () => openModal(node.id === 'dist' ? 'distribution' : node.id);
-                bubbleLayer.appendChild(circle);
+        .block {
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            box-sizing: border-box; /* Crucial so borders push inward */
+            background-color: #065f46; /* Matches PCB Green base */
+            
+            /* Concept 3: Populated Mini-boards (Pads, Vias, Traces) */
+            background-image: 
+                radial-gradient(circle at 8px 8px, #94a3b8 1.5px, transparent 2px), /* Silver pad */
+                radial-gradient(circle at 32px 32px, #fbbf24 2px, transparent 2.5px), /* Gold pad */
+                radial-gradient(circle at 8px 32px, #94a3b8 1.5px, transparent 2px), /* Silver pad */
+                linear-gradient(45deg, transparent 48%, rgba(251, 191, 36, 0.4) 48%, rgba(251, 191, 36, 0.4) 52%, transparent 52%), /* Trace */
+                linear-gradient(-45deg, transparent 65%, rgba(251, 191, 36, 0.4) 65%, rgba(251, 191, 36, 0.4) 68%, transparent 68%), /* Trace */
+                linear-gradient(rgba(245, 158, 11, 0.15), rgba(245, 158, 11, 0.15)), /* Soft orange copper glow */
+                linear-gradient(rgba(52, 211, 153, 0.25) 1px, transparent 1px), /* Base PCB Grid */
+                linear-gradient(90deg, rgba(52, 211, 153, 0.25) 1px, transparent 1px);
+            background-size: 40px 40px, 40px 40px, 40px 40px, 40px 40px, 40px 40px, 100% 100%, 40px 40px, 40px 40px;
+            
+            transition: top 1.5s cubic-bezier(0.4, 0, 0.2, 1), 
+                        left 1.5s cubic-bezier(0.4, 0, 0.2, 1),
+                        box-shadow 0.2s;
+        }
 
-                const label = document.createElement('div');
-                label.id = `label-${node.id}`;
-                label.className = `bubble-label absolute pointer-events-none flex flex-col justify-center z-[60]`;
-                label.innerHTML = `
-                    <div class="inner-text-wrapper text-center w-full flex flex-col items-center justify-center pointer-events-none origin-center">
-                        <span class="pct text-4xl md:text-5xl lg:text-6xl font-black leading-none tracking-tighter" style="color: ${node.cDark}">${node.val}%</span>
-                        <h2 class="title text-sm md:text-base lg:text-lg font-bold leading-tight mt-1 px-2" style="color: ${node.cDark}">${node.title}</h2>
-                        <p class="sub text-[10px] md:text-[11px] lg:text-sm font-medium opacity-80 leading-tight mt-1 px-4 hidden sm:block" style="color: ${node.cDark}">${node.sub}</p>
+        /* Mouse Bites (Breakaway Tabs) */
+        .mouse-bite {
+            position: absolute;
+            background-image: radial-gradient(circle, #0f172a 1.2px, transparent 1.5px);
+            background-size: 4px 4px;
+            z-index: 5;
+        }
+        .mouse-bite-top { top: 2px; left: 50%; transform: translateX(-50%); width: 12px; height: 2px; }
+        .mouse-bite-bottom { bottom: 2px; left: 50%; transform: translateX(-50%); width: 12px; height: 2px; }
+        .mouse-bite-left { left: 2px; top: 50%; transform: translateY(-50%); width: 2px; height: 12px; }
+        .mouse-bite-right { right: 2px; top: 50%; transform: translateY(-50%); width: 2px; height: 12px; }
+
+        /* Corner fix for concave inner corners */
+        .corner-fix {
+            position: absolute;
+            width: 4px; height: 4px;
+            background-color: #f59e0b;
+            z-index: 5;
+        }
+        .corner-fix::after {
+            content: ''; position: absolute;
+            width: 2px; height: 2px;
+            background-color: #0f172a;
+        }
+        .corner-TR { top: 0; right: 0; } .corner-TR::after { top: 0; right: 0; }
+        .corner-TL { top: 0; left: 0; } .corner-TL::after { top: 0; left: 0; }
+        .corner-BR { bottom: 0; right: 0; } .corner-BR::after { bottom: 0; right: 0; }
+        .corner-BL { bottom: 0; left: 0; } .corner-BL::after { bottom: 0; left: 0; }
+
+        /* Error Shake Animation */
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            50% { transform: translateX(5px); }
+            75% { transform: translateX(-5px); }
+        }
+        .shake {
+            animation: shake 0.3s;
+        }
+
+        /* Tools */
+        .tool-btn {
+            transition: all 0.2s;
+        }
+        .tool-btn.active {
+            background-color: #10b981;
+            color: #022c22;
+            transform: scale(1.1);
+            box-shadow: 0 0 15px rgba(16, 185, 129, 0.4);
+        }
+        .tool-btn:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+
+        /* Modals & Hardware Menu elements */
+        .modal-overlay {
+            position: fixed; inset: 0;
+            background: rgba(11, 17, 32, 0.85); /* Slightly transparent */
+            display: none;
+            flex-direction: column; align-items: center; justify-content: center;
+            z-index: 100; padding: 20px; text-align: center;
+        }
+
+        .hardware-menu {
+            position: relative;
+            padding-bottom: 64px; /* Space for gold edge */
+            background-color: #1e293b;
+            border: 2px solid #334155;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(0,0,0,0.5);
+        }
+        .mounting-hole {
+            position: absolute;
+            width: 22px; height: 22px;
+            background-color: #0b1120; /* Show background through */
+            border: 4px solid #d97706; /* Copper ring */
+            border-radius: 50%;
+            box-shadow: inset 0 4px 6px rgba(0,0,0,0.9), 0 1px 2px rgba(255,255,255,0.1);
+            z-index: 20;
+        }
+        .gold-edge {
+            position: absolute;
+            bottom: 0; left: 4%; right: 4%;
+            height: 28px;
+            background-image: repeating-linear-gradient(to right, #fbbf24, #fbbf24 8px, transparent 8px, transparent 12px);
+            border-top: 2px solid #b45309;
+            border-radius: 0 0 4px 4px;
+        }
+
+        .category-card {
+            transition: transform 0.2s, border-color 0.2s;
+        }
+        .category-card:hover {
+            transform: translateY(-2px);
+            border-color: #10b981;
+        }
+
+        /* Cinematic Animation */
+        #cinematic-container {
+            position: relative;
+            width: 160px;
+            height: 160px;
+            margin: 0 auto 20px;
+        }
+        
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center">
+
+    <!-- MAIN MENU -->
+    <div id="menu-modal" class="modal-overlay">
+        <div class="w-full max-w-4xl p-8 pt-10 rounded-xl hardware-menu">
+            
+            <!-- Hardware Accents -->
+            <div class="mounting-hole top-5 left-5"></div>
+            <div class="mounting-hole top-5 right-5"></div>
+            <div class="mounting-hole bottom-[46px] left-5"></div>
+            <div class="mounting-hole bottom-[46px] right-5"></div>
+            <div class="gold-edge"></div>
+
+            <h1 class="text-3xl text-center text-emerald-400 mb-8 retro-text tracking-wide relative z-10">PCB Yield Optimizer</h1>
+            <p class="mb-10 text-center text-slate-400 relative z-10">Minimize waste. Pack as many pieces onto the panel as possible.</p>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-5 relative z-10">
+                <button onclick="startLevel(1)" class="category-card p-6 bg-slate-700/50 rounded-lg border-2 border-transparent text-left hover:bg-slate-700 focus:outline-none">
+                    <div class="flex items-center justify-between mb-3">
+                        <h2 class="text-xl font-bold text-white">Level 1</h2>
+                        <span class="px-2 py-1 bg-slate-900 text-slate-300 text-xs rounded retro-text">Rigid</span>
                     </div>
-                `;
-                bubbleLayer.appendChild(label);
+                    <h3 class="text-lg text-emerald-400 mb-2 font-bold">Basic Placement</h3>
+                    <p class="text-slate-400 text-sm leading-relaxed">Place L-shaped cutouts onto the PCB panel. No tools available.</p>
+                </button>
+
+                <button onclick="startLevel(2)" class="category-card p-6 bg-slate-700/50 rounded-lg border-2 border-transparent text-left hover:bg-slate-700 focus:outline-none">
+                    <div class="flex items-center justify-between mb-3">
+                        <h2 class="text-xl font-bold text-white">Level 2</h2>
+                        <span class="px-2 py-1 bg-slate-900 text-blue-300 text-xs rounded retro-text">Rotate</span>
+                    </div>
+                    <h3 class="text-lg text-emerald-400 mb-2 font-bold">Orientation</h3>
+                    <p class="text-slate-400 text-sm leading-relaxed">Unlock the rotate tool. Change the orientation of the L-shapes to nest them better and reduce waste.</p>
+                </button>
+
+                <button onclick="startLevel(3)" class="category-card p-6 bg-slate-700/50 rounded-lg border-2 border-transparent text-left hover:bg-slate-700 focus:outline-none">
+                    <div class="flex items-center justify-between mb-3">
+                        <h2 class="text-xl font-bold text-white">Level 3</h2>
+                        <span class="px-2 py-1 bg-slate-900 text-purple-300 text-xs rounded retro-text">Redesign</span>
+                    </div>
+                    <h3 class="text-lg text-emerald-400 mb-2 font-bold">Design for Mfg</h3>
+                    <p class="text-slate-400 text-sm leading-relaxed">The engineers redesigned the shape! It has the same area but is now a rectangle. See how yield improves.</p>
+                </button>
+
+                <button onclick="startLevel(4)" class="category-card p-6 bg-slate-700/50 rounded-lg border-2 border-transparent text-left hover:bg-slate-700 focus:outline-none">
+                    <div class="flex items-center justify-between mb-3">
+                        <h2 class="text-xl font-bold text-white">Level 4</h2>
+                        <span class="px-2 py-1 bg-slate-900 text-amber-400 text-xs rounded retro-text">Modify</span>
+                    </div>
+                    <h3 class="text-lg text-emerald-400 mb-2 font-bold">The Scissors</h3>
+                    <p class="text-slate-400 text-sm leading-relaxed">Back to the L-shape, but now you can cut it into two modular pieces (1x2 and 2x1) to pack them perfectly.</p>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- LEVEL 3 CINEMATIC -->
+    <div id="cinematic-modal" class="modal-overlay">
+        <h2 class="text-2xl text-purple-400 retro-text mb-6">Engineering Update</h2>
+        <p class="text-slate-300 mb-10 max-w-md leading-relaxed text-center">"By flattening the L-shape into a straight line, we preserve the same surface area but drastically improve nesting on the panel."</p>
+        
+        <div id="cinematic-container">
+            <!-- Blocks will be injected here via JS -->
+        </div>
+
+        <button onclick="finishCinematic()" class="mt-8 px-6 py-3 bg-emerald-600 hover:bg-emerald-500 rounded text-sm font-bold text-white retro-text transition hidden tracking-wider" id="cine-start-btn">
+            START LEVEL 3
+        </button>
+    </div>
+
+    <!-- YIELD RESULT MODAL -->
+    <div id="result-modal" class="modal-overlay">
+        <div class="bg-slate-800 p-8 rounded-xl border border-emerald-500/50 shadow-2xl max-w-sm w-full">
+            <h2 class="text-2xl text-emerald-400 retro-text mb-8 text-center">Yield Report</h2>
+            
+            <div class="space-y-5 text-left mb-10">
+                <div class="flex justify-between border-b border-slate-700/50 pb-3">
+                    <span class="text-slate-400">Yield Area:</span>
+                    <span id="res-yield" class="font-bold text-xl text-emerald-300">0%</span>
+                </div>
+                <div class="flex justify-between border-b border-slate-700/50 pb-3">
+                    <span class="text-slate-400">Full Sets Placed:</span>
+                    <span id="res-sets" class="font-bold text-xl text-white">0</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="text-slate-400">Waste (Empty):</span>
+                    <span id="res-waste" class="font-bold text-xl text-amber-400">0</span>
+                </div>
+            </div>
+
+            <div class="flex gap-4 justify-center">
+                <button onclick="showMenu()" class="px-5 py-2.5 bg-slate-700 hover:bg-slate-600 rounded-md font-bold text-white transition">Menu</button>
+                <button onclick="startLevel(currentLevel)" class="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-500 rounded-md font-bold text-white transition shadow-lg shadow-emerald-900/20">Retry Level</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- GAME UI -->
+    <div id="game-container" class="hidden flex flex-col items-center w-full max-w-5xl py-8">
+        
+        <!-- Workspace Layout -->
+        <div class="flex flex-col gap-6 w-fit">
+            
+            <!-- Top Row: Columns -->
+            <div class="flex flex-col md:flex-row gap-8 lg:gap-12 items-start justify-center">
+                
+                <!-- Left Column (Header + Tools + Dispenser) -->
+                <div class="flex flex-col gap-5 w-[200px]">
+                    
+                    <!-- Top Left Header -->
+                    <div class="flex flex-col justify-end h-[56px]">
+                        <h2 class="text-xl text-emerald-400 retro-text mb-2 tracking-wide">PCB Yield</h2>
+                        <div id="level-indicator" class="text-xs text-slate-500 retro-text tracking-widest">LEVEL 1</div>
+                    </div>
+
+                    <!-- Toolbar -->
+                    <div class="w-[200px] bg-slate-800 p-2 rounded-xl border border-slate-700 flex gap-2 justify-center shadow-md">
+                        <button id="tool-hand" class="tool-btn active flex items-center justify-center p-2 rounded bg-slate-700 text-white w-12 h-12" onclick="selectTool('hand')" title="Hand (Drag)">
+                            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 11V6a2 2 0 0 0-4 0v4 M14 11V4a2 2 0 0 0-4 0v6 M10 11V5a2 2 0 0 0-4 0v9a6 6 0 0 0 10 3.5"/></svg>
+                        </button>
+                        <button id="tool-rotate" class="tool-btn flex items-center justify-center p-2 rounded bg-slate-700 text-white w-12 h-12 hidden" onclick="selectTool('rotate')" title="Rotate (90 deg)">
+                            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.59-8.31l-5.67-5.67"/></svg>
+                        </button>
+                        <button id="tool-scissors" class="tool-btn flex items-center justify-center p-2 rounded bg-slate-700 text-white w-12 h-12 hidden" onclick="selectTool('scissors')" title="Scissors (Cut shape)">
+                            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="6" cy="6" r="3"></circle><circle cx="6" cy="18" r="3"></circle><line x1="20" y1="4" x2="8.12" y2="15.88"></line><line x1="14.47" y1="14.48" x2="20" y2="20"></line><line x1="8.12" y1="8.12" x2="12" y2="12"></line></svg>
+                        </button>
+                    </div>
+
+                    <!-- Dispenser -->
+                    <div class="flex flex-col items-start">
+                        <div class="text-[10px] text-slate-500 mb-2 retro-text tracking-widest">DISPENSER</div>
+                        <div id="dispenser-box">
+                            <!-- Pieces spawn here -->
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- Right Column (Buttons + Board) -->
+                <div class="flex flex-col gap-5 items-start">
+                    
+                    <!-- Top Right Buttons -->
+                    <div class="flex gap-3 items-end h-[56px]">
+                        <button onclick="calculateYield()" class="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-500 rounded-md text-sm font-bold text-white transition shadow-lg shadow-emerald-900/30">
+                            Calculate Yield
+                        </button>
+                        <button onclick="showMenu()" class="px-4 py-2.5 bg-slate-800 hover:bg-slate-700 rounded-md text-sm font-bold text-slate-300 transition border border-slate-700">
+                            Menu
+                        </button>
+                    </div>
+
+                    <!-- Game Board Column -->
+                    <div class="flex flex-col items-start">
+                        <div class="text-[10px] text-slate-500 mb-2 retro-text tracking-widest">PANEL</div>
+                        
+                        <!-- Physical board with Silkscreen markings -->
+                        <div id="game-board">
+                            <!-- Fiducials -->
+                            <div class="fiducial top-[6px] left-[6px]"></div>
+                            <div class="fiducial top-[6px] right-[6px]"></div>
+                            <div class="fiducial bottom-[6px] left-[6px]"></div>
+                            <div class="fiducial bottom-[6px] right-[6px]"></div>
+                            
+                            <!-- Silkscreen Text -->
+                            <div class="absolute top-1 left-1/2 -translate-x-1/2 text-[8px] text-white/40 font-mono tracking-widest pointer-events-none select-none">FR4-PNL-V1</div>
+                            <div class="absolute bottom-1 left-1/2 -translate-x-1/2 text-[8px] text-white/40 font-mono tracking-widest pointer-events-none select-none">YIELD-OPT</div>
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- Bottom Row: Instructions / Specs -->
+            <div class="bg-slate-800/40 p-5 rounded-xl border border-slate-700/50 text-sm font-mono flex flex-col sm:flex-row justify-between items-center w-full gap-4 mt-2">
+                <div class="flex flex-col gap-2 w-full sm:w-auto">
+                    <div class="text-emerald-500/80 font-bold uppercase tracking-wider text-xs">Panel Specs</div>
+                    <div class="text-slate-300 text-xs flex gap-4">
+                        <span><span class="text-slate-500">Size:</span> 5x8 (40)</span>
+                        <span><span class="text-slate-500">Part:</span> 4 blocks</span>
+                    </div>
+                </div>
+                <div class="text-slate-400 text-xs leading-relaxed max-w-[220px] sm:text-right">
+                    Drag pieces to the board. Optimize layout to minimize waste!
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        // --- CONSTANTS & DATA ---
+        const CELL_SIZE = 40;
+        const GRID_COLS = 5;
+        const GRID_ROWS = 8;
+        
+        // Shape Matrices
+        const SHAPE_L = [
+            [1, 0],
+            [1, 0],
+            [1, 1]
+        ];
+        
+        const SHAPE_RECT = [
+            [1, 1, 1, 1]
+        ];
+
+        // Cut halves of the L Shape
+        const SHAPE_HALF_1 = [
+            [1],
+            [1]
+        ]; // Top vertical 2x1
+        
+        const SHAPE_HALF_2 = [
+            [1, 1]
+        ]; // Bottom horizontal 1x2
+
+        // --- GAME STATE ---
+        let currentLevel = 1;
+        let selectedTool = 'hand';
+        let pieces = []; // All pieces (in dispenser and on board)
+        let nextGroupId = 1;
+        let nextPieceId = 1;
+        let isPreCut = false; // Remembers if scissors were used
+        
+        // Dragging state
+        let activePiece = null;
+        let isDragging = false;
+        let dragOffset = { x: 0, y: 0 };
+        let originalPos = { x: 0, y: 0, location: '' };
+
+        // DOM Elements
+        const boardEl = document.getElementById('game-board');
+        const dispenserEl = document.getElementById('dispenser-box');
+
+        // --- INITIALIZATION ---
+        function showMenu() {
+            document.getElementById('menu-modal').style.display = 'flex';
+            document.getElementById('game-container').classList.add('hidden');
+            document.getElementById('result-modal').style.display = 'none';
+            document.getElementById('cinematic-modal').style.display = 'none';
+        }
+
+        function startLevel(level) {
+            currentLevel = level;
+            isPreCut = false; // Reset scissor memory
+            
+            // UI Setup
+            document.getElementById('menu-modal').style.display = 'none';
+            document.getElementById('result-modal').style.display = 'none';
+            
+            if (level === 3) {
+                playLevel3Cinematic();
+                return; // Game init will happen after cinematic
+            }
+            
+            initGame();
+        }
+
+        function initGame() {
+            document.getElementById('game-container').classList.remove('hidden');
+            document.getElementById('level-indicator').innerText = `LEVEL ${currentLevel}`;
+            
+            // Reset State
+            pieces = [];
+            nextGroupId = 1;
+            nextPieceId = 1;
+            
+            // Clear out placed blocks, but preserve silkscreen/fiducials
+            boardEl.querySelectorAll('.pcb-piece').forEach(p => p.remove());
+            dispenserEl.innerHTML = '';
+            
+            // Setup Tools
+            document.getElementById('tool-rotate').classList.toggle('hidden', currentLevel < 2);
+            document.getElementById('tool-scissors').classList.toggle('hidden', currentLevel < 4);
+            selectTool('hand');
+
+            spawnDispenserPiece();
+        }
+
+        // --- PIECE LOGIC ---
+
+        function getBlockStyles(r, c, matrix) {
+            // Helper to dynamically calculate outer borders for a combined shape outline
+            const isExposed = (rr, cc) => {
+                if (rr < 0 || rr >= matrix.length || cc < 0 || cc >= matrix[0].length) return true;
+                return matrix[rr][cc] === 0;
+            };
+
+            let expTop = isExposed(r-1, c);
+            let expBottom = isExposed(r+1, c);
+            let expLeft = isExposed(r, c-1);
+            let expRight = isExposed(r, c+1);
+
+            // Detect concave corners (where this block is filled, but diagonal is empty and adjacent sides are filled)
+            let concaveTR = !expTop && !expRight && isExposed(r-1, c+1);
+            let concaveTL = !expTop && !expLeft && isExposed(r-1, c-1);
+            let concaveBR = !expBottom && !expRight && isExposed(r+1, c+1);
+            let concaveBL = !expBottom && !expLeft && isExposed(r+1, c-1);
+
+            let shadows = [];
+            let orangeShadows = [];
+            let gapColor = '#0f172a'; // Dark table gap
+            let lineColor = '#f59e0b'; // Orange outline
+            
+            // Note: Box-shadows stack. First one is on top.
+            // Dark gap goes first (2px), then orange line (4px).
+            if (expTop) {
+                shadows.push(`inset 0 2px 0 0 ${gapColor}`);
+                orangeShadows.push(`inset 0 4px 0 0 ${lineColor}`);
+            }
+            if (expBottom) {
+                shadows.push(`inset 0 -2px 0 0 ${gapColor}`);
+                orangeShadows.push(`inset 0 -4px 0 0 ${lineColor}`);
+            }
+            if (expLeft) {
+                shadows.push(`inset 2px 0 0 0 ${gapColor}`);
+                orangeShadows.push(`inset 4px 0 0 0 ${lineColor}`);
+            }
+            if (expRight) {
+                shadows.push(`inset -2px 0 0 0 ${gapColor}`);
+                orangeShadows.push(`inset -4px 0 0 0 ${lineColor}`);
+            }
+
+            let allShadows = shadows.concat(orangeShadows);
+
+            let styles = {
+                boxShadow: allShadows.join(', '),
+                corners: [],
+                exposed: []
+            };
+            
+            if (concaveTR) styles.corners.push('TR');
+            if (concaveTL) styles.corners.push('TL');
+            if (concaveBR) styles.corners.push('BR');
+            if (concaveBL) styles.corners.push('BL');
+
+            // Keep track of exposed edges to inject Mouse Bites
+            if (expTop) styles.exposed.push('top');
+            if (expBottom) styles.exposed.push('bottom');
+            if (expLeft) styles.exposed.push('left');
+            if (expRight) styles.exposed.push('right');
+
+            return styles;
+        }
+
+        function applyStyles(block, styles) {
+            block.style.border = 'none'; // Ensure no borders shift dimensions
+            block.style.boxShadow = styles.boxShadow;
+            
+            // Remove existing decorations to prevent duplicates
+            Array.from(block.children).forEach(child => {
+                if (child.classList.contains('corner-fix') || child.classList.contains('mouse-bite')) {
+                    child.remove();
+                }
+            });
+            
+            // Add corner fixes
+            styles.corners.forEach(corner => {
+                let div = document.createElement('div');
+                div.className = `corner-fix corner-${corner}`;
+                block.appendChild(div);
             });
 
-            if (!isEngineRunning) {
-                isEngineRunning = true;
+            // Add Mouse Bites
+            styles.exposed.forEach(edge => {
+                let div = document.createElement('div');
+                div.className = `mouse-bite mouse-bite-${edge}`;
+                block.appendChild(div);
+            });
+        }
+
+        function spawnDispenserPiece() {
+            // Automatically spawn pre-cut halves if scissors were permanently applied
+            if (currentLevel === 4 && isPreCut) {
+                spawnCutHalves();
+                return;
+            }
+
+            let shape = currentLevel === 3 ? SHAPE_RECT : SHAPE_L;
+            
+            let p = {
+                id: `p_${nextPieceId++}`,
+                groupId: nextGroupId++,
+                matrix: JSON.parse(JSON.stringify(shape)),
+                x: 0, // Dispenser relative
+                y: 0,
+                location: 'dispenser',
+                type: currentLevel === 3 ? 'RECT' : 'L',
+                isHalf: false
+            };
+            
+            pieces.push(p);
+            renderPiece(p);
+            centerInDispenser();
+        }
+
+        function spawnCutHalves(gId) {
+            let gidToUse = gId || nextGroupId++;
+            let p1 = {
+                id: `p_${nextPieceId++}`,
+                groupId: gidToUse,
+                matrix: JSON.parse(JSON.stringify(SHAPE_HALF_1)),
+                x: 0, y: 0, location: 'dispenser', type: 'L', isHalf: true
+            };
+            let p2 = {
+                id: `p_${nextPieceId++}`,
+                groupId: gidToUse,
+                matrix: JSON.parse(JSON.stringify(SHAPE_HALF_2)),
+                x: 0, y: 0, location: 'dispenser', type: 'L', isHalf: true
+            };
+            pieces.push(p1, p2);
+            renderPiece(p1);
+            renderPiece(p2);
+            centerInDispenser();
+        }
+
+        function centerInDispenser() {
+            // Centers pieces visually in the dispenser box
+            let dispPieces = pieces.filter(p => p.location === 'dispenser');
+            if (dispPieces.length === 0) return;
+
+            const dispW = 200;
+            const dispH = 160;
+
+            if (dispPieces.length === 1) {
+                let p = dispPieces[0];
+                let el = document.getElementById(p.id);
+                let w = p.matrix[0].length * CELL_SIZE;
+                let h = p.matrix.length * CELL_SIZE;
+                el.style.left = `${(dispW - w)/2}px`;
+                el.style.top = `${(dispH - h)/2}px`;
+            } else if (dispPieces.length === 2) {
+                // If cut, place them side by side
+                let p1 = dispPieces[0];
+                let p2 = dispPieces[1];
+                let el1 = document.getElementById(p1.id);
+                let el2 = document.getElementById(p2.id);
+                
+                let w1 = p1.matrix[0].length * CELL_SIZE;
+                let h1 = p1.matrix.length * CELL_SIZE;
+                let w2 = p2.matrix[0].length * CELL_SIZE;
+                let h2 = p2.matrix.length * CELL_SIZE;
+
+                // Center the pair side by side with a 20px gap
+                let totalW = w1 + 20 + w2;
+                let startX = (dispW - totalW) / 2;
+                
+                el1.style.left = `${startX}px`;
+                el1.style.top = `${(dispH - h1)/2}px`;
+                
+                el2.style.left = `${startX + w1 + 20}px`;
+                el2.style.top = `${(dispH - h2)/2}px`;
+            }
+        }
+
+        function checkDispenser() {
+            let count = pieces.filter(p => p.location === 'dispenser').length;
+            if (count === 0) {
+                spawnDispenserPiece();
+            }
+        }
+
+        function renderPiece(p) {
+            let el = document.getElementById(p.id);
+            if (!el) {
+                el = document.createElement('div');
+                el.id = p.id;
+                el.className = 'pcb-piece';
+                
+                // Event Listeners for Interaction
+                el.addEventListener('mousedown', (e) => handlePieceInteraction(e, p));
+                el.addEventListener('touchstart', (e) => { e.preventDefault(); handlePieceInteraction(e.touches[0], p); }, {passive: false});
+                
+                if (p.location === 'dispenser') dispenserEl.appendChild(el);
+                else boardEl.appendChild(el);
+            }
+            
+            // Clear current blocks
+            el.innerHTML = '';
+            
+            // Rebuild blocks based on matrix
+            let height = p.matrix.length;
+            let width = p.matrix[0].length;
+            
+            el.style.width = `${width * CELL_SIZE}px`;
+            el.style.height = `${height * CELL_SIZE}px`;
+
+            for (let r = 0; r < height; r++) {
+                for (let c = 0; c < width; c++) {
+                    if (p.matrix[r][c] === 1) {
+                        let block = document.createElement('div');
+                        block.className = 'block';
+                        block.style.left = `${c * CELL_SIZE}px`;
+                        block.style.top = `${r * CELL_SIZE}px`;
+                        
+                        // Dynamically apply continuous outline + tabs
+                        applyStyles(block, getBlockStyles(r, c, p.matrix));
+                        
+                        el.appendChild(block);
+                    }
+                }
+            }
+
+            // Update Position if on board
+            if (p.location === 'board') {
+                el.style.left = `${p.x * CELL_SIZE}px`;
+                el.style.top = `${p.y * CELL_SIZE}px`;
+            }
+        }
+
+        // --- INTERACTION LOGIC ---
+
+        function selectTool(tool) {
+            selectedTool = tool;
+            document.querySelectorAll('.tool-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById(`tool-${tool}`).classList.add('active');
+            
+            // Update cursors
+            let cursorMap = {
+                'hand': 'grab',
+                'rotate': 'pointer',
+                'scissors': 'crosshair'
+            };
+            document.body.style.cursor = cursorMap[tool];
+        }
+
+        function handlePieceInteraction(e, piece) {
+            if (selectedTool === 'rotate') {
+                rotatePiece(piece);
+                return;
+            }
+            if (selectedTool === 'scissors') {
+                cutPiece(piece);
+                return;
+            }
+            if (selectedTool === 'hand') {
+                startDrag(e, piece);
+            }
+        }
+
+        function rotatePiece(piece) {
+            let oldMatrix = piece.matrix;
+            let newMatrix = rotateMatrix(oldMatrix);
+
+            piece.matrix = newMatrix;
+            
+            if (piece.location === 'board') {
+                // Check if new rotation is valid
+                if (!isValidPlacement(piece)) {
+                    // Revert if invalid
+                    piece.matrix = oldMatrix;
+                    let el = document.getElementById(piece.id);
+                    el.classList.add('shake');
+                    setTimeout(() => el.classList.remove('shake'), 300);
+                    return;
+                }
+            }
+            
+            renderPiece(piece);
+            if (piece.location === 'dispenser') centerInDispenser();
+        }
+
+        function cutPiece(piece) {
+            if (piece.location !== 'dispenser') return; // Can only cut in dispenser
+            if (piece.type !== 'L' || piece.isHalf) {
+                // Error visual if already cut or wrong shape
+                let el = document.getElementById(piece.id);
+                el.classList.add('shake');
+                setTimeout(() => el.classList.remove('shake'), 300);
+                return;
+            }
+
+            // Global trigger: all future pieces in this level are now cut automatically
+            isPreCut = true; 
+
+            // Remove original
+            document.getElementById(piece.id).remove();
+            pieces = pieces.filter(p => p.id !== piece.id);
+
+            // Create Halves using original shape's Group ID
+            spawnCutHalves(piece.groupId);
+        }
+
+        function rotateMatrix(matrix) {
+            const M = matrix.length;
+            const N = matrix[0].length;
+            let result = new Array(N).fill(0).map(() => new Array(M).fill(0));
+            for (let r = 0; r < M; r++) {
+                for (let c = 0; c < N; c++) {
+                    result[c][M - 1 - r] = matrix[r][c];
+                }
+            }
+            return result;
+        }
+
+        // --- DRAG AND DROP ---
+        
+        function startDrag(e, piece) {
+            isDragging = true;
+            activePiece = piece;
+            
+            let el = document.getElementById(piece.id);
+            let rect = el.getBoundingClientRect();
+            
+            // Support for both touch and mouse events
+            let clientX = e.clientX || e.touches[0].clientX;
+            let clientY = e.clientY || e.touches[0].clientY;
+
+            dragOffset.x = clientX - rect.left;
+            dragOffset.y = clientY - rect.top;
+
+            originalPos = { 
+                x: el.style.left, 
+                y: el.style.top, 
+                location: piece.location,
+                gridX: piece.x,
+                gridY: piece.y
+            };
+
+            // Switch style context to dragging
+            el.setAttribute('data-location', 'dragging');
+
+            // Move to body so it drags over everything
+            document.body.appendChild(el);
+            el.style.left = `${clientX - dragOffset.x}px`;
+            el.style.top = `${clientY - dragOffset.y}px`;
+            
+            // If dragging from board, temporarily remove it from logic mapping to allow placing it elsewhere
+            if (piece.location === 'board') {
+                piece.location = 'dragging'; 
+            }
+        }
+
+        window.addEventListener('mousemove', dragMove);
+        window.addEventListener('touchmove', (e) => { if(isDragging) dragMove(e.touches[0]); }, {passive: false});
+        window.addEventListener('mouseup', dragEnd);
+        window.addEventListener('touchend', dragEnd);
+
+        function dragMove(e) {
+            if (!isDragging || !activePiece) return;
+            let el = document.getElementById(activePiece.id);
+            let clientX = e.clientX || (e.touches ? e.touches[0].clientX : 0);
+            let clientY = e.clientY || (e.touches ? e.touches[0].clientY : 0);
+            
+            el.style.left = `${clientX - dragOffset.x}px`;
+            el.style.top = `${clientY - dragOffset.y}px`;
+        }
+
+        function dragEnd(e) {
+            if (!isDragging || !activePiece) return;
+            
+            let el = document.getElementById(activePiece.id);
+            let boardRect = boardEl.getBoundingClientRect();
+            let elRect = el.getBoundingClientRect();
+
+            // Calculate center of the dragged piece for hit detection
+            let cx = elRect.left + (elRect.width/2);
+            let cy = elRect.top + (elRect.height/2);
+
+            if (cx > boardRect.left && cx < boardRect.right && cy > boardRect.top && cy < boardRect.bottom) {
+                // Dropped on board
+                // Calculate Grid coords relative to board top-left
+                let relX = elRect.left - boardRect.left;
+                let relY = elRect.top - boardRect.top;
+                
+                let gridX = Math.round(relX / CELL_SIZE);
+                let gridY = Math.round(relY / CELL_SIZE);
+
+                activePiece.x = gridX;
+                activePiece.y = gridY;
+                activePiece.location = 'board';
+
+                if (isValidPlacement(activePiece)) {
+                    // Valid! Snap to grid
+                    boardEl.appendChild(el);
+                    el.style.left = `${gridX * CELL_SIZE}px`;
+                    el.style.top = `${gridY * CELL_SIZE}px`;
+                    renderPiece(activePiece); // Updates the data-location for board styling
+                    checkDispenser();
+                } else {
+                    // Invalid, revert
+                    revertDrag(el);
+                }
+            } else {
+                // Dropped outside board
+                if (originalPos.location === 'dispenser') {
+                    revertDrag(el);
+                } else {
+                    // Delete piece if dragged off board entirely
+                    el.remove();
+                    pieces = pieces.filter(p => p.id !== activePiece.id);
+                }
+            }
+
+            isDragging = false;
+            activePiece = null;
+        }
+
+        function revertDrag(el) {
+            activePiece.location = originalPos.location;
+            activePiece.x = originalPos.gridX;
+            activePiece.y = originalPos.gridY;
+            renderPiece(activePiece); // Restores correct CSS state
+            
+            if (activePiece.location === 'dispenser') {
+                dispenserEl.appendChild(el);
+                el.style.left = originalPos.x;
+                el.style.top = originalPos.y;
+            } else {
+                boardEl.appendChild(el);
+                el.style.left = originalPos.x;
+                el.style.top = originalPos.y;
+            }
+        }
+
+        function isValidPlacement(piece) {
+            let h = piece.matrix.length;
+            let w = piece.matrix[0].length;
+
+            // Check Bounds
+            if (piece.x < 0 || piece.y < 0 || piece.x + w > GRID_COLS || piece.y + h > GRID_ROWS) {
+                return false;
+            }
+
+            // Check Collision with other pieces on board
+            let otherPieces = pieces.filter(p => p.location === 'board' && p.id !== piece.id);
+            
+            for (let r = 0; r < h; r++) {
+                for (let c = 0; c < w; c++) {
+                    if (piece.matrix[r][c] === 1) {
+                        let absX = piece.x + c;
+                        let absY = piece.y + r;
+
+                        // Check against all other placed blocks
+                        for (let op of otherPieces) {
+                            let opH = op.matrix.length;
+                            let opW = op.matrix[0].length;
+                            
+                            for (let opr = 0; opr < opH; opr++) {
+                                for (let opc = 0; opc < opW; opc++) {
+                                    if (op.matrix[opr][opc] === 1) {
+                                        if (op.x + opc === absX && op.y + opr === absY) {
+                                            return false; // Collision
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            return true;
+        }
+
+        // --- CALCULATION ---
+        function calculateYield() {
+            let totalCells = GRID_COLS * GRID_ROWS;
+            let usedCells = 0;
+            let uniqueGroups = new Set();
+            
+            let boardPieces = pieces.filter(p => p.location === 'board');
+
+            boardPieces.forEach(p => {
+                let blocks = 0;
+                p.matrix.forEach(row => row.forEach(val => blocks += val));
+                usedCells += blocks;
+                uniqueGroups.add(p.groupId);
+            });
+
+            let yieldPct = Math.round((usedCells / totalCells) * 100);
+            let waste = totalCells - usedCells;
+            
+            document.getElementById('res-yield').innerText = `${yieldPct}%`;
+            document.getElementById('res-sets').innerText = uniqueGroups.size;
+            document.getElementById('res-waste').innerText = waste;
+
+            document.getElementById('result-modal').style.display = 'flex';
+        }
+
+        // --- LEVEL 3 CINEMATIC ---
+        function playLevel3Cinematic() {
+            const modal = document.getElementById('cinematic-modal');
+            const container = document.getElementById('cinematic-container');
+            const btn = document.getElementById('cine-start-btn');
+            
+            modal.style.display = 'flex';
+            container.innerHTML = '';
+            btn.classList.add('hidden');
+
+            // Draw L Shape
+            const blocks = [];
+            const L_MATRIX = [ [1, 0], [1, 0], [1, 1] ];
+            const coordsL = [ [0,0], [1,0], [2,0], [2,1] ];
+            
+            coordsL.forEach((c, i) => {
+                let el = document.createElement('div');
+                el.className = 'block';
+                el.style.top = `${c[0] * CELL_SIZE}px`;
+                el.style.left = `${c[1] * CELL_SIZE + 40}px`; // center slightly
+                
+                applyStyles(el, getBlockStyles(c[0], c[1], L_MATRIX));
+                
+                container.appendChild(el);
+                blocks.push(el);
+            });
+
+            // Trigger Animation after 1s
+            setTimeout(() => {
+                // Morph into 1x4 horizontal rectangle
+                const RECT_MATRIX = [ [1, 1, 1, 1] ];
+                const coordsR = [ [0,0], [0,1], [0,2], [0,3] ];
+
+                blocks.forEach((el, i) => {
+                    let r = coordsR[i][0];
+                    let c = coordsR[i][1];
+                    el.style.top = '60px'; 
+                    el.style.left = `${c * CELL_SIZE}px`;
+                    applyStyles(el, getBlockStyles(r, c, RECT_MATRIX));
+                });
+                
+                setTimeout(() => {
+                    btn.classList.remove('hidden');
+                }, 1500);
+            }, 1000);
+        }
+
+        function finishCinematic() {
+            document.getElementById('cinematic-modal').style.display = 'none';
+            initGame();
+        }
+
+        // Run menu on load
+        showMenu();
+
+    </script>
+</body>
+</html>
+</textarea>
+
+        <!-- Application Logic -->
+        <script>
+            // --- Modal Loading ---
+            const overlay = document.getElementById('modalOverlay');
+            const modals = document.querySelectorAll('.modal-content');
+
+            function openModal(phaseId) {
+                modals.forEach(m => { m.classList.add('hidden'); m.classList.remove('modal-enter'); });
+                overlay.classList.remove('hidden');
+                setTimeout(() => { overlay.classList.remove('opacity-0'); }, 10);
+                
+                const targetModal = document.getElementById(`modal-${phaseId}`);
+                if (targetModal) {
+                    targetModal.classList.remove('hidden');
+                    setTimeout(() => targetModal.classList.add('modal-enter'), 10);
+                }
+                document.body.style.overflow = 'hidden';
+            }
+
+            function closeModal() {
+                overlay.classList.add('opacity-0');
+                setTimeout(() => { 
+                    overlay.classList.add('hidden'); 
+                    document.body.style.overflow = 'auto';
+                }, 300);
+            }
+
+            function closeModalOnOutsideClick(event) { if (event.target === overlay) closeModal(); }
+
+            // --- IFrame Modal Logic ---
+            const iframeOverlay = document.getElementById('iframeModal');
+            const externalIframe = document.getElementById('externalIframe');
+
+            function openIframe(url) {
+                externalIframe.style.opacity = '0'; 
+                externalIframe.src = url;
+                iframeOverlay.classList.remove('hidden');
+                setTimeout(() => { iframeOverlay.classList.remove('opacity-0'); }, 10);
+                document.body.style.overflow = 'hidden';
+            }
+
+            function closeIframe() {
+                iframeOverlay.classList.add('opacity-0');
+                setTimeout(() => { 
+                    iframeOverlay.classList.add('hidden'); 
+                    externalIframe.src = ''; 
+                    
+                    if(overlay.classList.contains('hidden') && gameOverlay.classList.contains('hidden')) {
+                        document.body.style.overflow = 'auto';
+                    }
+                }, 300);
+            }
+
+            function closeIframeOnOutsideClick(event) { if (event.target === iframeOverlay) closeIframe(); }
+
+            // IFrame Browser Controls
+            function iframeGoBack() {
+                try { externalIframe.contentWindow.history.back(); } 
+                catch (e) { console.warn("Cross-origin security prevents accessing iframe history directly."); }
+            }
+            function iframeGoForward() {
+                try { externalIframe.contentWindow.history.forward(); } 
+                catch (e) { console.warn("Cross-origin security prevents accessing iframe history directly."); }
+            }
+            function iframeRefresh() {
+                externalIframe.style.opacity = '0';
+                setTimeout(() => { externalIframe.src = externalIframe.src; }, 50);
+            }
+            function iframeOpenNew() {
+                window.open(externalIframe.src, '_blank');
+            }
+
+            // --- Game Modal Logic ---
+            const gameOverlay = document.getElementById('gameModal');
+            const gameIframe = document.getElementById('gameIframe');
+
+            function openGame(sourceId, title) {
+                // Load the raw game code from the hidden textarea into a local blob url
+                const rawGameCode = document.getElementById(sourceId).value;
+                const blob = new Blob([rawGameCode], {type: 'text/html'});
+                gameIframe.src = URL.createObjectURL(blob);
+                
+                document.getElementById('game-modal-title').innerText = title;
+                
+                gameOverlay.classList.remove('hidden');
+                setTimeout(() => { gameOverlay.classList.remove('opacity-0'); }, 10);
+                document.body.style.overflow = 'hidden';
+            }
+
+            function closeGame() {
+                gameOverlay.classList.add('opacity-0');
+                setTimeout(() => { 
+                    gameOverlay.classList.add('hidden'); 
+                    gameIframe.src = ''; // completely stops the game engine/intervals
+                    
+                    if(overlay.classList.contains('hidden') && iframeOverlay.classList.contains('hidden')) {
+                        document.body.style.overflow = 'auto';
+                    }
+                }, 300);
+            }
+
+            function closeGameOnOutsideClick(event) { if (event.target === gameOverlay) closeGame(); }
+
+            // Global Escape Key Handler for all Modals
+            document.addEventListener('keydown', e => { 
+                if (e.key === "Escape") {
+                    if(!gameOverlay.classList.contains('hidden')) {
+                        closeGame();
+                    } else if(!iframeOverlay.classList.contains('hidden')) {
+                        closeIframe();
+                    } else if(!overlay.classList.contains('hidden')) {
+                        closeModal();
+                    }
+                } 
+            });
+
+            // --- Data Source ---
+            const lcaData = [
+                { name: "Logitech", s: 64, d: 18, u: 13, e: 5 },
+                { name: "PWS", s: 80, d: 10, u: 5, e: 5 },
+                { name: "Gaming", s: 55, d: 15, u: 25, e: 5 },
+                { name: "TWS", s: 40, d: 5, u: 50, e: 5 },
+                { name: "MX Master 4", s: 80, d: 10, u: 3, e: 7 },
+                { name: "PRO X SUPERLIGHT 2", s: 57, d: 19, u: 18, e: 6 },
+                { name: "MX Keys S", s: 55, d: 26, u: 14, e: 5 },
+                { name: "G915 X LIGHTSPEED", s: 84, d: 9, u: 2, e: 5 },
+                { name: "Zone 300 Headset", s: 68, d: 21, u: 5, e: 6 },
+                { name: "G733", s: 74, d: 4, u: 18, e: 4 },
+                { name: "Brio 500", s: 60, d: 7, u: 32, e: 1 },
+                { name: "Combo Touch", s: 70, d: 24, u: 1, e: 5 },
+                { name: "Rally Bar", s: 38, d: 2, u: 59, e: 1 },
+                { name: "PRO Racing Wheel", s: 41, d: 7, u: 49, e: 3 }
+            ];
+
+            // --- Explore Menu Setup ---
+            let currentIndex = 0;
+
+            function renderOptions() {
+                const row1 = document.getElementById('options-row-1');
+                const row2 = document.getElementById('options-row-2');
+                row1.innerHTML = ''; row2.innerHTML = '';
+                
+                lcaData.forEach((data, index) => {
+                    const btn = document.createElement('button');
+                    btn.innerText = data.name;
+                    
+                    const baseClasses = "px-3 py-1.5 md:px-4 md:py-2 rounded-xl font-bold text-[11px] md:text-sm transition-colors duration-300 border border-transparent whitespace-nowrap";
+                    if (index === currentIndex) {
+                        btn.className = `${baseClasses} bg-brand-teal text-brand-darkGreen shadow-md z-10`;
+                    } else {
+                        btn.className = `${baseClasses} bg-white text-brand-black/70 hover:bg-brand-lightGreen hover:text-brand-darkGreen border-brand-lightGray/50`;
+                    }
+                    
+                    btn.onclick = () => {
+                        currentIndex = index;
+                        renderOptions();
+                        updateDataEngine(index);
+                    };
+
+                    if (index < 4) row1.appendChild(btn);
+                    else row2.appendChild(btn);
+                });
+            }
+
+            // --- Custom Vanilla JS Physics Engine ---
+            let bubbleNodes = [
+                { id: 'sourcing', title: 'Sourcing & Manufacture', sub: 'Impact of making our products', val: 0, currentR: 0, targetR: 0, layoutR: 0, cLight: '#E6D9FF', cDark: '#32156D', currentX: 0, currentY: 0, targetX: 0, targetY: 0, isHovered: false },
+                { id: 'dist', title: 'Distribution', sub: 'Impact of getting our products to consumers', val: 0, currentR: 0, targetR: 0, layoutR: 0, cLight: '#D5DDFF', cDark: '#3A4A87', currentX: 0, currentY: 0, targetX: 0, targetY: 0, isHovered: false },
+                { id: 'use', title: 'Consumer Use', sub: 'Impact of using our products', val: 0, currentR: 0, targetR: 0, layoutR: 0, cLight: '#BFC8DB', cDark: '#313A49', currentX: 0, currentY: 0, targetX: 0, targetY: 0, isHovered: false },
+                { id: 'eol', title: 'End of Life', sub: 'Impact of disposing of our products', val: 0, currentR: 0, targetR: 0, layoutR: 0, cLight: '#FFC6CD', cDark: '#A3001A', currentX: 0, currentY: 0, targetX: 0, targetY: 0, isHovered: false }
+            ];
+
+            let width = 0, height = 0, centerY = 0;
+            const bubbleLayer = document.getElementById('bubble-layer');
+            let isEngineRunning = false;
+            let isFirstLoad = true;
+            
+            function initBubbles() {
+                bubbleNodes.forEach((node, i) => {
+                    const circle = document.createElement('button');
+                    circle.id = `circle-${node.id}`;
+                    circle.className = `bubble-node absolute rounded-full pointer-events-auto border border-brand-black/5`;
+                    circle.style.backgroundColor = node.cLight;
+                    
+                    circle.onmouseenter = () => node.isHovered = true;
+                    circle.onmouseleave = () => node.isHovered = false;
+                    circle.onclick = () => openModal(node.id === 'dist' ? 'distribution' : node.id);
+                    bubbleLayer.appendChild(circle);
+
+                    const label = document.createElement('div');
+                    label.id = `label-${node.id}`;
+                    label.className = `bubble-label absolute pointer-events-none flex flex-col justify-center z-[60]`;
+                    label.innerHTML = `
+                        <div class="inner-text-wrapper text-center w-full flex flex-col items-center justify-center pointer-events-none origin-center">
+                            <span class="pct text-4xl md:text-5xl lg:text-6xl font-black leading-none tracking-tighter" style="color: ${node.cDark}">${node.val}%</span>
+                            <h2 class="title text-sm md:text-base lg:text-lg font-bold leading-tight mt-1 px-2" style="color: ${node.cDark}">${node.title}</h2>
+                            <p class="sub text-[10px] md:text-[11px] lg:text-sm font-medium opacity-80 leading-tight mt-1 px-4 hidden sm:block" style="color: ${node.cDark}">${node.sub}</p>
+                        </div>
+                    `;
+                    bubbleLayer.appendChild(label);
+                });
+
+                if (!isEngineRunning) {
+                    isEngineRunning = true;
+                    requestAnimationFrame(physicsLoop);
+                }
+            }
+
+            function updateDataEngine(index) {
+                const data = lcaData[index];
+                
+                // UI Updates
+                document.getElementById('modal-val-sourcing').innerText = data.s + '% of Impact';
+                document.getElementById('modal-val-dist').innerText = data.d + '% of Impact';
+                document.getElementById('modal-val-use').innerText = data.u + '% of Impact';
+                document.getElementById('modal-val-eol').innerText = data.e + '% of Impact';
+
+                // Mathematical Bubble Sizing
+                const MIN_PCT = 10; 
+                let items = [
+                    { id: 'sourcing', val: Math.max(data.s, MIN_PCT) },
+                    { id: 'dist', val: Math.max(data.d, MIN_PCT) },
+                    { id: 'use', val: Math.max(data.u, MIN_PCT) },
+                    { id: 'eol', val: Math.max(data.e, MIN_PCT) }
+                ];
+                let sum = items.reduce((acc, i) => acc + i.val, 0);
+
+                bubbleNodes.forEach(node => {
+                    let pct = items.find(i => i.id === node.id).val / sum;
+                    node.baseWeight = Math.pow(pct, 0.65); 
+                    
+                    if(node.id === 'sourcing') node.val = data.s;
+                    if(node.id === 'dist') node.val = data.d;
+                    if(node.id === 'use') node.val = data.u;
+                    if(node.id === 'eol') node.val = data.e;
+                    
+                    const label = document.getElementById(`label-${node.id}`);
+                    if (label) {
+                        label.querySelector('.pct').innerText = node.val + '%';
+                    }
+                });
+            }
+
+            // Custom Butter-Smooth Physics Engine
+            function physicsLoop() {
+                const time = Date.now() * 0.0015;
+
+                // Recalculate dimensions dynamically every frame. 
+                width = document.getElementById('chart-container').clientWidth;
+                height = document.getElementById('chart-container').clientHeight;
+                centerY = (height - 60) / 2;
+
+                if (isFirstLoad) {
+                    bubbleNodes.forEach(node => {
+                        node.currentY = centerY;
+                        node.targetY = centerY;
+                    });
+                    isFirstLoad = false;
+                }
+
+                let totalWeight = bubbleNodes.reduce((a, node) => a + node.baseWeight, 0);
+                let targetTotalWidth = width * 0.85;
+
+                let maxWeight = Math.max(...bubbleNodes.map(n => n.baseWeight));
+                let hypotheticalMaxRadius = (maxWeight / totalWeight) * targetTotalWidth / 2;
+                let maxAllowedRadius = (height - 80) * 0.45; 
+                
+                if (hypotheticalMaxRadius > maxAllowedRadius) {
+                    let reductionRatio = maxAllowedRadius / hypotheticalMaxRadius;
+                    targetTotalWidth *= reductionRatio;
+                }
+
+                bubbleNodes.forEach(node => {
+                    node.targetR = (node.baseWeight / totalWeight) * targetTotalWidth / 2;
+                });
+
+                // 1. Update Radii
+                bubbleNodes.forEach((d) => {
+                    let actualTargetR = d.isHovered ? d.targetR * 1.05 : d.targetR;
+                    d.currentR += (actualTargetR - d.currentR) * 0.08;
+                    
+                    if(d.layoutR === 0) d.layoutR = d.targetR;
+                    d.layoutR += (d.targetR - d.layoutR) * 0.08;
+                });
+
+                // 2. Guarantee 100% Touching Alignment
+                let totalCurrentWidth = bubbleNodes.reduce((sum, d) => sum + (d.currentR * 2), 0);
+                let currentXPos = (width - totalCurrentWidth) / 2;
+
+                bubbleNodes.forEach((d, i) => {
+                    // X Axis
+                    d.targetX = currentXPos + d.currentR;
+                    currentXPos += d.currentR * 2;
+                    d.currentX += (d.targetX - d.currentX) * 0.1;
+
+                    // Y Axis: Subtle Wobble
+                    d.targetY = centerY + Math.sin(time + i * 1.5) * 5;
+                    d.currentY += (d.targetY - d.currentY) * 0.1;
+
+                    // 3. Hardware Accelerated DOM Updates
+                    const circle = document.getElementById(`circle-${d.id}`);
+                    if(circle) {
+                        circle.style.width = `${d.currentR * 2}px`;
+                        circle.style.height = `${d.currentR * 2}px`;
+                        circle.style.transform = `translate3d(${d.currentX - d.currentR}px, ${d.currentY - d.currentR}px, 0)`;
+                    }
+
+                    const label = document.getElementById(`label-${d.id}`);
+                    if(label) {
+                        const innerWrapper = label.querySelector('.inner-text-wrapper');
+                        
+                        label.style.width = `${d.layoutR * 1.85}px`;
+                        label.style.transform = `translate3d(${d.currentX}px, ${d.currentY}px, 0) translate(-50%, -50%)`;
+                        
+                        const scaleFactor = Math.min(1, d.layoutR / 100);
+                        innerWrapper.style.transform = `scale(${scaleFactor})`;
+                    }
+                });
+
                 requestAnimationFrame(physicsLoop);
             }
-        }
 
-        function updateDataEngine(index) {
-            const data = lcaData[index];
-            
-            // UI Updates
-            document.getElementById('modal-val-sourcing').innerText = data.s + '% of Impact';
-            document.getElementById('modal-val-dist').innerText = data.d + '% of Impact';
-            document.getElementById('modal-val-use').innerText = data.u + '% of Impact';
-            document.getElementById('modal-val-eol').innerText = data.e + '% of Impact';
+            // --- Carousel Logic ---
+            let currentCarouselIndex = 0;
+            let carouselInterval = null;
+            let carouselPauseTimeout = null;
 
-            // Mathematical Bubble Sizing
-            const MIN_PCT = 10; 
-            let items = [
-                { id: 'sourcing', val: Math.max(data.s, MIN_PCT) },
-                { id: 'dist', val: Math.max(data.d, MIN_PCT) },
-                { id: 'use', val: Math.max(data.u, MIN_PCT) },
-                { id: 'eol', val: Math.max(data.e, MIN_PCT) }
-            ];
-            let sum = items.reduce((acc, i) => acc + i.val, 0);
-
-            bubbleNodes.forEach(node => {
-                let pct = items.find(i => i.id === node.id).val / sum;
-                node.baseWeight = Math.pow(pct, 0.65); 
-                
-                if(node.id === 'sourcing') node.val = data.s;
-                if(node.id === 'dist') node.val = data.d;
-                if(node.id === 'use') node.val = data.u;
-                if(node.id === 'eol') node.val = data.e;
-                
-                const label = document.getElementById(`label-${node.id}`);
-                if (label) {
-                    label.querySelector('.pct').innerText = node.val + '%';
-                }
-            });
-
-            // Target sizes calculated continuously in physics loop to be strictly immune to layout shifts
-        }
-
-        // Custom Butter-Smooth Physics Engine
-        function physicsLoop() {
-            const time = Date.now() * 0.0015;
-
-            // Recalculate dimensions dynamically every frame. 
-            // This guarantees bubbles center perfectly on the exact frame the fonts load!
-            width = document.getElementById('chart-container').clientWidth;
-            height = document.getElementById('chart-container').clientHeight;
-            centerY = (height - 60) / 2;
-
-            if (isFirstLoad) {
-                bubbleNodes.forEach(node => {
-                    node.currentY = centerY;
-                    node.targetY = centerY;
-                });
-                isFirstLoad = false;
-            }
-
-            // Continuously resize targets based on live container width
-            let totalWeight = bubbleNodes.reduce((a, node) => a + node.baseWeight, 0);
-            let targetTotalWidth = width * 0.85;
-
-            let maxWeight = Math.max(...bubbleNodes.map(n => n.baseWeight));
-            let hypotheticalMaxRadius = (maxWeight / totalWeight) * targetTotalWidth / 2;
-            let maxAllowedRadius = (height - 80) * 0.45; 
-            
-            if (hypotheticalMaxRadius > maxAllowedRadius) {
-                let reductionRatio = maxAllowedRadius / hypotheticalMaxRadius;
-                targetTotalWidth *= reductionRatio;
-            }
-
-            bubbleNodes.forEach(node => {
-                node.targetR = (node.baseWeight / totalWeight) * targetTotalWidth / 2;
-            });
-
-            // 1. Update Radii
-            bubbleNodes.forEach((d) => {
-                // actualTargetR visually expands the bubble bubble on hover
-                let actualTargetR = d.isHovered ? d.targetR * 1.05 : d.targetR;
-                d.currentR += (actualTargetR - d.currentR) * 0.08;
-                
-                // layoutR is entirely immune to hover states. 
-                // This ensures text box width & font scaling stays rock solid!
-                if(d.layoutR === 0) d.layoutR = d.targetR;
-                d.layoutR += (d.targetR - d.layoutR) * 0.08;
-            });
-
-            // 2. Guarantee 100% Touching Alignment
-            let totalCurrentWidth = bubbleNodes.reduce((sum, d) => sum + (d.currentR * 2), 0);
-            let currentXPos = (width - totalCurrentWidth) / 2;
-
-            bubbleNodes.forEach((d, i) => {
-                // X Axis
-                d.targetX = currentXPos + d.currentR;
-                currentXPos += d.currentR * 2;
-                d.currentX += (d.targetX - d.currentX) * 0.1;
-
-                // Y Axis: Subtle Wobble
-                d.targetY = centerY + Math.sin(time + i * 1.5) * 5;
-                d.currentY += (d.targetY - d.currentY) * 0.1;
-
-                // 3. Hardware Accelerated DOM Updates
-                const circle = document.getElementById(`circle-${d.id}`);
-                if(circle) {
-                    circle.style.width = `${d.currentR * 2}px`;
-                    circle.style.height = `${d.currentR * 2}px`;
-                    circle.style.transform = `translate3d(${d.currentX - d.currentR}px, ${d.currentY - d.currentR}px, 0)`;
-                }
-
-                const label = document.getElementById(`label-${d.id}`);
-                if(label) {
-                    const innerWrapper = label.querySelector('.inner-text-wrapper');
-                    
-                    // Anchoring label width to layoutR instead of currentR ensures text won't reflow on hover
-                    label.style.width = `${d.layoutR * 1.85}px`;
-                    label.style.transform = `translate3d(${d.currentX}px, ${d.currentY}px, 0) translate(-50%, -50%)`;
-                    
-                    const scaleFactor = Math.min(1, d.layoutR / 100);
-                    innerWrapper.style.transform = `scale(${scaleFactor})`;
-                }
-            });
-
-            requestAnimationFrame(physicsLoop);
-        }
-
-        // --- Carousel Logic ---
-        let currentCarouselIndex = 0;
-        let carouselInterval = null;
-        let carouselPauseTimeout = null;
-
-        function startAutoCycle() {
-            if (carouselInterval) clearInterval(carouselInterval);
-            
-            carouselInterval = setInterval(() => {
-                changeCarousel(1, false);
-            }, 5000);
-        }
-
-        function initCarousel() {
-            const images = document.querySelectorAll('.carousel-img');
-            if (images.length === 0) return;
-            startAutoCycle();
-        }
-
-        function changeCarousel(direction, isManual = true) {
-            const images = document.querySelectorAll('.carousel-img');
-            if (images.length === 0) return;
-
-            // Fade out current image
-            images[currentCarouselIndex].classList.remove('opacity-100');
-            images[currentCarouselIndex].classList.add('opacity-0');
-            
-            // Calculate next index wrapping around correctly
-            currentCarouselIndex = (currentCarouselIndex + direction + images.length) % images.length;
-            
-            // Fade in new image
-            images[currentCarouselIndex].classList.remove('opacity-0');
-            images[currentCarouselIndex].classList.add('opacity-100');
-
-            if (isManual) {
-                // Pause auto-cycle
+            function startAutoCycle() {
                 if (carouselInterval) clearInterval(carouselInterval);
-                if (carouselPauseTimeout) clearTimeout(carouselPauseTimeout);
                 
-                // Resume auto-cycle after 30 seconds
-                carouselPauseTimeout = setTimeout(() => {
-                    startAutoCycle();
-                }, 30000);
+                carouselInterval = setInterval(() => {
+                    changeCarousel(1, false);
+                }, 5000);
             }
-        }
 
-        // --- Window Resize Hook ---
-        window.addEventListener('resize', () => {
-            if (isEngineRunning) {
-                updateDataEngine(currentIndex);
+            function initCarousel() {
+                const images = document.querySelectorAll('.carousel-img');
+                if (images.length === 0) return;
+                startAutoCycle();
             }
-        });
 
-        // --- Safe DOM Initialization ---
-        window.addEventListener("load", () => {
-            // Waiting for full window load ensures web fonts and CSS flexbox layouts 
-            // have completely finished rendering before measuring container height.
-            setTimeout(() => {
-                initBubbles();
-                renderOptions();
-                updateDataEngine(0);
-                initCarousel();
+            function changeCarousel(direction, isManual = true) {
+                const images = document.querySelectorAll('.carousel-img');
+                if (images.length === 0) return;
+
+                images[currentCarouselIndex].classList.remove('opacity-100');
+                images[currentCarouselIndex].classList.add('opacity-0');
                 
-                // Hard snap the initial Y position so the bubbles don't slowly float up from a 0-height state
-                bubbleNodes.forEach(node => {
-                    node.currentY = centerY;
-                    node.targetY = centerY;
-                });
-            }, 50);
-        });
-    </script>
+                currentCarouselIndex = (currentCarouselIndex + direction + images.length) % images.length;
+                
+                images[currentCarouselIndex].classList.remove('opacity-0');
+                images[currentCarouselIndex].classList.add('opacity-100');
+
+                if (isManual) {
+                    if (carouselInterval) clearInterval(carouselInterval);
+                    if (carouselPauseTimeout) clearTimeout(carouselPauseTimeout);
+                    
+                    carouselPauseTimeout = setTimeout(() => {
+                        startAutoCycle();
+                    }, 30000);
+                }
+            }
+
+            // --- Window Resize Hook ---
+            window.addEventListener('resize', () => {
+                if (isEngineRunning) {
+                    updateDataEngine(currentIndex);
+                }
+            });
+
+            // --- Safe DOM Initialization ---
+            window.addEventListener("load", () => {
+                setTimeout(() => {
+                    initBubbles();
+                    renderOptions();
+                    updateDataEngine(0);
+                    initCarousel();
+                }, 100);
+            });
+        </script>
 </body>
 </html>
